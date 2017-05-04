@@ -49,13 +49,13 @@
           <p></p>
           <table class="mdl-data-table mdl-js-data-table">
             <thead>
-              <tr class="mdl-color--grey-300 mdl-color-text--grey-600 mdl-typography--font-bold">
+              <tr>
                 <td class="mdl-data-table__cell--non-numeric">Kit label</td>
                 <td class="mdl-data-table__cell--non-numeric">Kit status</td>
               </tr>
             </thead>
             <tbody>
-              <tr class="mdl-color--grey-300 mdl-color-text--grey-800">
+              <tr>
                 <td class="mdl-data-table__cell--non-numeric">{{ items[0].kitLabel }}</td>
                 <td class="mdl-data-table__cell--non-numeric">{{ items[0].kitStatus }}</td>
               </tr>
@@ -64,14 +64,14 @@
           <p></p>
           <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
             <thead>
-              <tr class="mdl-color--grey-50 mdl-color-text--grey-600 mdl-typography--font-bold">
+              <tr>
 
                 <td class="mdl-data-table__cell--non-numeric">Component</td>
                 <td>Quantity</td>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in items" class="mdl-color--grey-50">
+              <tr v-for="item in items">
                 <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
                 <td>{{ item.quantity }}</td>
               </tr>
@@ -236,5 +236,12 @@ $mdc-theme-background: #fff;
 
 .mdl-data-table {
   @include mdc-elevation(2);
+
+  thead {
+    background-color: rgb(224,224,224);
+    color: rgb(117,117,117);
+    font-weight: 500;
+  }
 }
+
 </style>
