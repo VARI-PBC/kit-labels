@@ -1,0 +1,226 @@
+[
+  {
+    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT LBR-CryoELITE Vial","CPT NCI-CryoELITE Vial","CPT LBR-OCT Mold 15x15x5","CPT NCI-OCT Mold 15x15x5"],
+    "labels": [
+      {
+        "description": "cryovial",
+        "templateFile": "CPTAC Cryovial.btw",
+        "printer": "BW2BW10"
+      },
+      {
+        "description": "paperwork",
+        "templateFile": "CPTAC Paperwork.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "1-4,5,6,7-10",
+        "padding": "00"
+      },
+      { 
+        "name": "btDescription",
+        "value": "Frozen Tissue"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","LBR-CPTAC FFPE Tissue Kit"],
+    "componentTypes": ["CPT NCI-FFPE Cassettes","CPT LBR-FFPE Cassettes"],
+    "labels": [
+      {
+        "templateFile": "CPTAC cassette.btw",
+        "printer": "Leica IP-C"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "11-20"
+      },
+      { 
+        "name": "btDescription",
+        "value": "FFPE QC Block"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT NCI-Glass Slides","CPT LBR-Glass Slides"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Glass Slide Label.btw",
+        "printer": "BW2BW11"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "21-30"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT NCI-EDTA 6ml Tube","CPT LBR-EDTA 6ml Tube"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Cryovial.btw",
+        "printer": "BW2BW10"
+      },
+      {
+        "templateFile": "CPTAC Paperwork.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "31-32"
+      },
+      { 
+        "name": "btDescription",
+        "value": "Whole Blood"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT NCI-Cryovials 2mL","CPT LBR-Cryovials 2mL"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Cryovial.btw",
+        "printer": "BW2BW10"
+      },
+      {
+        "templateFile": "CPTAC Paperwork.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "71-72"
+      },
+      { 
+        "name": "btDescription",
+        "value": "Blood Derivatives"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
+    "componentTypes": ["CPT NCI-Glass Slides","CPT LBR-Glass Slides"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Glass Slide Label.btw",
+        "printer": "BW2BW11"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "41-43"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
+    "componentTypes": ["CPT NCI-ACD 6ml Tube","CPT LBR-ACD 6ml Tube"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Cryovial.btw",
+        "printer": "BW2BW10"
+      },
+      {
+        "templateFile": "CPTAC Paperwork.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "33-35"
+      },
+      { 
+        "name": "btDescription",
+        "value": "Bone Marrow"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
+    "componentTypes": ["CPT NCI-SepMate","CPT LBR-SepMate"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Cryovial.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
+    "componentTypes": ["CPT NCI-Cryovials 2mL","CPT LBR-Cryovials 2mL"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Cryovial.btw",
+        "printer": "BW2BW10"
+      },
+      {
+        "templateFile": "CPTAC Paperwork.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "50-53"
+      },
+      { 
+        "name": "btDescription",
+        "value": "Buccal Swab"
+      }
+    ]
+  },
+  {
+    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
+    "componentTypes": ["CPT NCI-Microcentrifuge Tube 1.5ml","CPT LBR-Microcentrifuge Tube 1.5ml"],
+    "labels": [
+      {
+        "templateFile": "CPTAC Cryovial.btw",
+        "printer": "BW2BW10"
+      },
+      {
+        "templateFile": "CPTAC Paperwork.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btID",
+        "value": "%kitLabel%-%sequence%",
+        "sequenceSpec": "54-64"
+      },
+      { 
+        "name": "btDescription",
+        "value": "Cell Pellet"
+      }
+    ]
+  }
+]
