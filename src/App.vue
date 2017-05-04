@@ -47,11 +47,11 @@
       <main class="main">
         <template v-for="items in kits">
           <p></p>
-          <table class="mdl-data-table mdl-js-data-table">
+          <table class="mdl-data-table">
             <thead>
               <tr>
-                <td class="mdl-data-table__cell--non-numeric">Kit label</td>
-                <td class="mdl-data-table__cell--non-numeric">Kit status</td>
+                <th class="mdl-data-table__cell--non-numeric">Kit label</th>
+                <th class="mdl-data-table__cell--non-numeric">Kit status</th>
               </tr>
             </thead>
             <tbody>
@@ -62,12 +62,11 @@
             </tbody>
           </table>
           <p></p>
-          <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
+          <table ref="componentsTables" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
             <thead>
               <tr>
-
-                <td class="mdl-data-table__cell--non-numeric">Component</td>
-                <td>Quantity</td>
+                <th class="mdl-data-table__cell--non-numeric">Component</th>
+                <th>Quantity</th>
               </tr>
             </thead>
             <tbody>
@@ -90,11 +89,14 @@
 </template>
 
 <script>
+/* global componentHandler */
 import Toolbar from './components/Toolbar';
 import mdcSelect from './components/Select';
 import {MDCTextfield} from '@material/textfield';
 import Snackbar from './components/Snackbar';
-
+require('./assets/mdl/mdlComponentHandler');
+require('./assets/mdl/data-table/data-table');
+require('./assets/mdl/checkbox/checkbox');
 
 export default {
   name: 'app',
@@ -103,7 +105,8 @@ export default {
     return {
       kitTypes: [],
       kitComponents: [],
-      loading: false
+      loading: false,
+      dataTable: null
     }
   },
   computed: {
@@ -180,6 +183,11 @@ export default {
   mounted () {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
+  },
+  updated () {
+    if (this.$refs.componentsTables !== undefined && this.$refs.componentsTables.length > 0) {
+      componentHandler.upgradeElements(this.$refs.componentsTables);
+    }
   }
 }
 </script>
@@ -196,7 +204,8 @@ $mdc-theme-background: #fff;
 <style src="@material/textfield/mdc-textfield.scss" lang="scss"></style>
 <style src="@material/drawer/permanent/mdc-permanent-drawer.scss" lang="scss"></style>
 <style src="@material/button/mdc-button.scss" lang="scss"></style>
-<style src="./assets/data-table/data-table.scss" lang="scss"></style>
+<style src="./assets/mdl/data-table/data-table.scss" lang="scss"></style>
+<style src="./assets/mdl/checkbox/checkbox.scss" lang="scss"></style>
 
 <style lang="scss">
 
