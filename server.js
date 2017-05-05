@@ -1,3 +1,4 @@
+//@ts-check
 /* global __dirname */
 'use strict';
 var fs = require('fs');
@@ -10,6 +11,11 @@ var fp = require('lodash/fp');
 var express = require('express');
 var app = express();
 
+var sessionId;
+var kitTypes;
+var kitConfigs;
+var statusLabels;
+
 // Serve files from the dist directory
 app.use('/', express.static(path.resolve(__dirname, 'dist')));
 
@@ -20,16 +26,16 @@ client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) 
     console.error(error);
     process.exit(1);
   }
-  app.sessionId = value;
+  sessionId = value;
 
   // Periodically ping the web service to keep the session active.
   function ping () {
-    client.methodCall('common.ping', [app.sessionId], function (error) {
+    client.methodCall('common.ping', [sessionId], function (error) {
       if (error) {
-        if (error.code >= 9000) {
+        if (error['code'] >= 9000) {
           client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) {
             if (!error) {
-              app.sessionId = value;
+              sessionId = value;
             }
           });
         }
@@ -46,9 +52,9 @@ client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) 
   }];
   var display = ['kit_template.name', 'kit_template.kit_template_id'];
   var sort = ['kit_template.study_id', 'kit_template.name'];
-  client.methodCall('report.execute', [app.sessionId, criteria, display, sort, 0, 1], function (error, result) {
+  client.methodCall('report.execute', [sessionId, criteria, display, sort, 0, 1], function (error, result) {
     if (!error) {
-      app.kitTypes = result.rows.map(function (row) { return { name: row[0], value: row[1] }; });
+      kitTypes = result.rows.map(function (row) { return { name: row[0], value: row[1] }; });
     }
   });
 
@@ -58,9 +64,9 @@ client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) 
     operator: 'not equals',
     field: 'lkup_kit_status.label'
   }];
-  client.methodCall('report.execute', [app.sessionId, criteria, ['lkup_kit_status.label'], [], 0, 1], function (error, result) {
+  client.methodCall('report.execute', [sessionId, criteria, ['lkup_kit_status.label'], [], 0, 1], function (error, result) {
     if (!error) {
-      app.statusLabels = result.rows;
+      statusLabels = result.rows;
     }
   });
 });
@@ -72,10 +78,10 @@ var fileNames = fs.readdirSync(labelConfigs);
 var configFiles = fp.flow(
   fp.filter(file => file.endsWith('.json')),
   fp.map(file => JSON.parse(fs.readFileSync(
-    path.resolve(labelConfigs, file)))
+    path.resolve(labelConfigs, file)).toString())
   ))(fileNames);
 var mergedConfigs = Array.prototype.concat.apply([], configFiles);
-app.kitConfigs = fp.flow(
+kitConfigs = fp.flow(
   fp.map(cfg =>
     fp.map(kt => fp.flow( // expand kit types
       fp.set('kitType', kt),
@@ -114,8 +120,7 @@ function generateLabelSequence (v) {
 }
 
 function buildKitComponents (resultSet, kitType) {
-  let kitTypeName = fp.find(kt => kt.value === kitType)(app.kitTypes).name;
-  let kitConfigs = app.kitConfigs[kitTypeName];
+  let kitTypeName = fp.find(kt => kt.value === kitType)(kitTypes).name;
   var kits = resultSet.rows.map(function (row) {
     let kitComponent = {
       kitLabel: row[0],
@@ -123,7 +128,7 @@ function buildKitComponents (resultSet, kitType) {
       componentType: row[2],
       quantity: Number(row[3])
     };
-    let labelConfig = fp.find(cfg => cfg.componentType === kitComponent.componentType)(kitConfigs);
+    let labelConfig = fp.find(cfg => cfg.componentType === kitComponent.componentType)(kitConfigs[kitTypeName]);
     if (labelConfig) {
       var generateValues = variable =>
         fp.zipWith((val, seq) => fp.replace('%sequence%', seq || '', val),
@@ -159,12 +164,12 @@ function fetchKitComponents (kitType, kitStatus, callback) {
       field: 'kit_template.kit_template_id'
     }];
   let display = ['kit.label', '+kit.status', '+kit_component.supply_type'];
-  client.methodCall('report.execute', [app.sessionId, criteria, display, [], 0, 2], function (error, result) {
+  client.methodCall('report.execute', [sessionId, criteria, display, [], 0, 2], function (error, result) {
     if (error) {
-      if (error.code >= 9000) {
+      if (error['code'] >= 9000) {
         client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) {
           if (!error) {
-            app.sessionId = value;
+            sessionId = value;
           }
         });
       }
@@ -179,7 +184,11 @@ function fetchKitComponents (kitType, kitStatus, callback) {
 /// routes ///
 
 app.get('/api/kitTypes', function (request, response) {
-  response.json(app.kitTypes);
+  response.json(kitTypes);
+});
+
+app.get('/api/statusLabels', function (request, response) {
+  response.json(statusLabels);
 });
 
 app.get('/api/kits', function (request, response) {
