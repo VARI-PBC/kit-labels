@@ -3,98 +3,172 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-var xmlrpc = require('xmlrpc');
-var config = require('./backendConfig');
+const config = require('./backendConfig');
 var fp = require('lodash/fp');
+const https = require('https');
+const querystring = require('querystring');
 
 // Create an express app
 var express = require('express');
 var app = express();
 
-var sessionId;
-var kitTypes;
-var kitConfigs;
-var statusLabels;
-
 // Serve files from the dist directory
 app.use('/', express.static(path.resolve(__dirname, 'dist')));
 
-// Create the XML-RPC client and log on to the BSI web service.
-var client = xmlrpc.createSecureClient(config.bsi.url);
-client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) {
-  if (error) {
-    console.error(error);
-    process.exit(1);
+// memoized global variables
+var cachedData = {
+  get sessionId () {
+    if (!this._sessionId) {
+      this._sessionId = logon();
+    }
+    return this._sessionId;
+  },
+  get kitTypes () {
+    delete this.kitTypes;
+    this.kitTypes = getKitTypes();
+    return this.kitTypes;
+  },
+  get statusLabels () {
+    delete this.statusLabels;
+    this.statusLabels = getStatusLabels();
+    return this.statusLabels;
+  },
+  get kitConfigs () {
+    delete this.kitConfigs;
+    this.kitConfigs = getKitConfigs();
+    return this.kitConfigs;
   }
-  sessionId = value;
+}
 
-  // Periodically ping the web service to keep the session active.
-  function ping () {
-    client.methodCall('common.ping', [sessionId], function (error) {
-      if (error) {
-        if (error['code'] >= 9000) {
-          client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) {
-            if (!error) {
-              sessionId = value;
-            }
-          });
+// log on to BSI
+async function logon () {
+  const options = {
+    hostname: config.bsi.hostname,
+    path: `/api/rest/${config.bsi.database}/common/logon`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'text/plain'
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      res.setEncoding('utf8');
+      res.on('data', (d) => {
+        if (res.statusCode < 200 || res.statusCode > 299) {
+          var error = JSON.parse(d.toString());
+          console.error(error);
+          reject(error['message']);
+        } else {
+          resolve(d);
         }
-      }
+      });
     });
-  }
-  setInterval(ping, config.bsi.pingInterval);
 
-  // fetch kit types
-  var criteria = [{
-    value: '@@Missing',
-    operator: 'not equals',
-    field: 'kit_template.name'
-  }];
-  var display = ['kit_template.name', 'kit_template.kit_template_id'];
-  var sort = ['kit_template.study_id', 'kit_template.name'];
-  client.methodCall('report.execute', [sessionId, criteria, display, sort, 0, 1], function (error, result) {
-    if (!error) {
-      kitTypes = result.rows.map(function (row) { return { name: row[0], value: row[1] }; });
-    }
+    req.on('error', (e) => {
+      reject(e);
+    });
+
+    req.write(querystring.stringify(config.bsi.logonArgs));
+    req.end();
   });
+}
 
-  // fetch kit statuses
-  criteria = [{
-    value: '@@Missing',
-    operator: 'not equals',
-    field: 'lkup_kit_status.label'
-  }];
-  client.methodCall('report.execute', [sessionId, criteria, ['lkup_kit_status.label'], [], 0, 1], function (error, result) {
-    if (!error) {
-      statusLabels = result.rows;
+// wrap BSI reporting interface
+async function bsiQuery (queryParams) {
+  const options = {
+    hostname: config.bsi.hostname,
+    path: `/api/rest/${config.bsi.database}/reports/list?`,
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'BSI-SESSION-ID': await cachedData.sessionId
     }
-  });
-});
+  };
+  options.path += querystring.stringify(queryParams);
 
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      var data = '';
+      res.setEncoding('utf8');
+      res.on('data', (d) => {
+        data += d;
+      });
+      res.on('end', () => {
+        if (res.statusCode < 200 || res.statusCode > 299) {
+          var error = JSON.parse(data.toString());
+          console.error(error);
+          if (error['code'] === '9000') {
+            delete cachedData._sessionId;
+          }
+          reject(error['message']);
+        } else {
+          var result = JSON.parse(data.toString());
+          resolve(result['rows']);
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      reject(e);
+    });
+
+    req.end();
+  });
+}
+
+async function getKitTypes () {
+  const queryParams = {
+    display_fields: [ 'kit_template.name', 'kit_template.kit_template_id' ],
+    criteria: [ 'kit_template.name!=@@Missing' ],
+    sort: [ 'kit_template.study_id', 'kit_template.name' ],
+    limit: 0
+  };
+
+  var result = await bsiQuery(queryParams);
+  return result.map((row) => { return { name: row[0], value: row[1] }; });
+}
+
+async function getStatusLabels () {
+  const queryParams = {
+    display_fields: [ 'lkup_kit_status.label' ],
+    criteria: [ 'lkup_kit_status.label!=@@Missing' ],
+    sort: [],
+    limit: 0
+  };
+
+  return await bsiQuery(queryParams);
+}
 
 // Read in label configs
-var labelConfigs = path.resolve(__dirname, 'label_configs');
-var fileNames = fs.readdirSync(labelConfigs);
-var configFiles = fp.flow(
-  fp.filter(file => file.endsWith('.json')),
-  fp.map(file => JSON.parse(fs.readFileSync(
-    path.resolve(labelConfigs, file)).toString())
-  ))(fileNames);
-var mergedConfigs = Array.prototype.concat.apply([], configFiles);
-kitConfigs = fp.flow(
-  fp.map(cfg =>
-    fp.map(kt => fp.flow( // expand kit types
-      fp.set('kitType', kt),
-      fp.omit('kitTypes'))(cfg)
-    )(cfg.kitTypes)),
-  fp.flatten,
-  fp.map(cfg =>
-    fp.map(ct => fp.flow( // expand component types
-      fp.set('componentType', ct),
-      fp.omit('componentTypes'))(cfg)
-    )(cfg.componentTypes)),
-  fp.flatten,
-  fp.groupBy('kitType'))(mergedConfigs);
+function getKitConfigs () {
+  return new Promise((resolve, reject) => {
+    var labelConfigs = path.resolve(__dirname, 'label_configs');
+    var fileNames = fs.readdirSync(labelConfigs);
+    var configFiles = fp.flow(
+      fp.filter(file => file.endsWith('.json')),
+      fp.map(file => JSON.parse(fs.readFileSync(
+        path.resolve(labelConfigs, file), 'utf8'))
+      ))(fileNames);
+    var mergedConfigs = Array.prototype.concat.apply([], configFiles);
+    var kitConfigs = fp.flow(
+      fp.map(cfg =>
+        fp.map(kt => fp.flow( // expand kit types
+          fp.set('kitType', kt),
+          fp.omit('kitTypes'))(cfg)
+        )(cfg.kitTypes)),
+      fp.flatten,
+      fp.map(cfg =>
+        fp.map(ct => fp.flow( // expand component types
+          fp.set('componentType', ct),
+          fp.omit('componentTypes'))(cfg)
+        )(cfg.componentTypes)),
+      fp.flatten,
+      fp.groupBy('kitType'))(mergedConfigs);
+    resolve(kitConfigs);
+  });
+}
 
 function generateLabelSequence (v) {
   if (!v.sequenceSpec) {
@@ -119,16 +193,17 @@ function generateLabelSequence (v) {
   }
 }
 
-function buildKitComponents (resultSet, kitType) {
-  let kitTypeName = fp.find(kt => kt.value === kitType)(kitTypes).name;
-  var kits = resultSet.rows.map(function (row) {
+async function buildKitComponents (resultSet, kitType) {
+  let kitTypeName = fp.find(kt => kt.value === kitType)(await cachedData.kitTypes).name;
+  var kitConfig = (await cachedData.kitConfigs)[kitTypeName];
+  var kits = resultSet.map(function (row) {
     let kitComponent = {
       kitLabel: row[0],
       kitStatus: row[1],
       componentType: row[2],
       quantity: Number(row[3])
     };
-    let labelConfig = fp.find(cfg => cfg.componentType === kitComponent.componentType)(kitConfigs[kitTypeName]);
+    let labelConfig = fp.find(cfg => cfg.componentType === kitComponent.componentType)(kitConfig);
     if (labelConfig) {
       var generateValues = variable =>
         fp.zipWith((val, seq) => fp.replace('%sequence%', seq || '', val),
@@ -150,55 +225,40 @@ function buildKitComponents (resultSet, kitType) {
   return kits.filter(kit => kit.labels);
 }
 
-// kits/components query
-function fetchKitComponents (kitType, kitStatus, callback) {
-  let criteria = [
-    {
-      value: kitStatus,
-      operator: 'equals',
-      field: 'kit.status'
-    },
-    {
-      value: kitType,
-      operator: 'equals',
-      field: 'kit_template.kit_template_id'
-    }];
-  let display = ['kit.label', '+kit.status', '+kit_component.supply_type'];
-  client.methodCall('report.execute', [sessionId, criteria, display, [], 0, 2], function (error, result) {
-    if (error) {
-      if (error['code'] >= 9000) {
-        client.methodCall('common.logon', config.bsi.logonArgs, function (error, value) {
-          if (!error) {
-            sessionId = value;
-          }
-        });
-      }
-    } else {
-      var kits = buildKitComponents(result, kitType);
-    }
-    callback(kits, error);
-  });
-}
-
 
 /// routes ///
 
-app.get('/api/kitTypes', function (request, response) {
-  response.json(kitTypes);
+app.get('/api/kitTypes', async function (request, response) {
+  try {
+    response.json(await cachedData.kitTypes);
+  } catch (error) {
+    response.status(500).json(error);
+  }
 });
 
-app.get('/api/statusLabels', function (request, response) {
-  response.json(statusLabels);
+app.get('/api/statusLabels', async function (request, response) {
+  try {
+    response.json(await cachedData.statusLabels);
+  } catch (error) {
+    response.status(500).json(error);
+  }
 });
 
-app.get('/api/kits', function (request, response) {
-  fetchKitComponents(request.query.kitType, request.query.kitStatus, function (kits, error) {
-    if (error) {
-      response.status(500).json(error);
-    } else {
-      response.json(kits);
-    }
-  });
+app.get('/api/kits', async function (request, response) {
+  const queryParams = {
+    display_fields: ['kit.label', '+kit.status', '+kit_component.supply_type'],
+    criteria: [ `kit_template.kit_template_id=${request.query.kitType}`, `kit.status=${request.query.kitStatus}` ],
+    sort: [],
+    limit: 10000
+  };
+
+  try {
+    var result = await bsiQuery(queryParams);
+    var kits = await buildKitComponents(result, request.query.kitType);
+    response.json(kits);
+  } catch (error) {
+    response.status(500).json(error);
+  }
 });
 
 
