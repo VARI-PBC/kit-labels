@@ -4,7 +4,7 @@
     <toolbar title="Kit labels">
       <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark"
           value="Select kit type"
-          @input="(value) => { this.fetchKitComponents(value, 'Available'); }"
+          @input="value => { fetchKitComponents(value, selectedStatuses); }"
           :options="kitTypes">
         <template scope="item">
           <li class="mdc-list-item" role="option" :id="item.optionValue" tabindex="0">
@@ -37,7 +37,7 @@
           </nav>
           <hr class="mdc-list-divider">
           <nav class="mdc-list">
-            <a class="mdc-list-item" href="#">
+            <a class="mdc-list-item" @click="$refs.statuses.show()">
               Select statuses...
             </a>
           </nav>
@@ -83,6 +83,20 @@
           <span>Print selected</span>
         </button>
         <snackbar event="notify"></snackbar>
+        <mdc-dialog 
+          title="Choose kit statuses to include in query"
+          ref="statuses"
+          :useDefaultFooter="false"
+          ariaDescription="my-mdc-dialog-description">
+          <section id="my-mdc-dialog-description" class="mdc-dialog__body">
+            <div class="two-columns">
+              <div v-for="status in kitStatuses" class="mdc-form-field">
+                <mdc-checkbox :id="'my-checkbox-'+status.id" :labelId="'my-checkbox-label-'+status.id" :value="status.id" v-model="selectedStatuses" />
+                <label :id="'my-checkbox-label-'+status.id" :for="'my-checkbox-'+status.id">{{ status.label }}</label>
+              </div>
+            </div>
+          </section>
+        </mdc-dialog>
       </main>
     </div>
   </body>
@@ -94,19 +108,23 @@ import Toolbar from './components/Toolbar';
 import mdcSelect from './components/Select';
 import {MDCTextfield} from '@material/textfield';
 import Snackbar from './components/Snackbar';
+import mdcDialog from './components/Dialog';
+import mdcCheckbox from './components/Checkbox';
 require('./assets/mdl/mdlComponentHandler');
 require('./assets/mdl/data-table/data-table');
 require('./assets/mdl/checkbox/checkbox');
 
 export default {
   name: 'app',
-  components: { Toolbar, mdcSelect, Snackbar },
+  components: { Toolbar, mdcSelect, Snackbar, mdcDialog, mdcCheckbox },
   data () {
     return {
       kitTypes: [],
+      kitStatuses: [],
       kitComponents: [],
       loading: false,
-      dataTable: null
+      dataTable: null,
+      selectedStatuses: []
     }
   },
   computed: {
@@ -128,30 +146,30 @@ export default {
     }
   },
   methods: {
-    fetchKitComponents (kitType, kitStatus) {
+    fetchKitComponents (kitType, kitStatuses) {
       var vm = this;
       vm.loading = true;
-      fetch('api/kits?kitType=' + kitType + '&kitStatus=' + kitStatus)
-        .then(function (response) {
-          vm.loading = false;
-          if (response.ok) {
-            response.json().then(function (kitComponents) {
-              vm.kitComponents = kitComponents.map(function (item) {
-                item.selected = false;
-                return item;
-              });
+      fetch('api/kits?kitType=' + kitType + '&kitStatus=' + kitStatuses.join(';'))
+      .then(function (response) {
+        vm.loading = false;
+        if (response.ok) {
+          response.json().then(function (kitComponents) {
+            vm.kitComponents = kitComponents.map(function (item) {
+              item.selected = false;
+              return item;
             });
-          } else {
-            vm.$root.$emit('notify', {
-              message: 'Fetch kit data failed.',
-              actionHandler: () => {
-                vm.fetchKitComponents(kitType, kitStatus);
-              },
-              actionText: 'Retry',
-              timeout: 5000
-            });
-          }
-        });
+          });
+        } else {
+          vm.$root.$emit('notify', {
+            message: 'Fetch kit data failed.',
+            actionHandler: () => {
+              vm.fetchKitComponents(kitType, kitStatuses);
+            },
+            actionText: 'Retry',
+            timeout: 5000
+          });
+        }
+      });
     },
     printSelected () {
       this.$root.$emit('notify', {
@@ -163,22 +181,39 @@ export default {
   created () {
     var vm = this;
     fetch('api/kitTypes')
-      .then(function (response) {
-        if (response.ok) {
-          response.json().then(function (json) {
-            vm.kitTypes = vm.kitTypes.concat(json);
-          });
-        } else {
-          this.$root.$emit('notify', {
-            message: 'Unexpected server error. Try reloading the page.',
-            actionHandler: () => {
-              window.location.reload(true);
-            },
-            actionText: 'Reload',
-            timeout: 5000
-          });
-        }
-      });
+    .then(function (response) {
+      if (response.ok) {
+        response.json().then(function (data) {
+          vm.kitTypes = data;
+        });
+      } else {
+        this.$root.$emit('notify', {
+          message: 'Unexpected server error. Try reloading the page.',
+          actionHandler: () => {
+            window.location.reload(true);
+          },
+          actionText: 'Reload',
+          timeout: 5000
+        });
+      }
+    });
+    fetch('api/kitStatuses')
+    .then(response => {
+      if (response.ok) {
+        response.json().then(function (data) {
+          vm.kitStatuses = data;
+        });
+      } else {
+        this.$root.$emit('notify', {
+          message: 'Unexpected server error. Try reloading the page.',
+          actionHandler: () => {
+            window.location.reload(true);
+          },
+          actionText: 'Reload',
+          timeout: 5000
+        });
+      }
+    })
   },
   mounted () {
     // wire up MDC components
@@ -206,6 +241,8 @@ $mdc-theme-background: #fff;
 <style src="@material/button/mdc-button.scss" lang="scss"></style>
 <style src="./assets/mdl/data-table/data-table.scss" lang="scss"></style>
 <style src="./assets/mdl/checkbox/checkbox.scss" lang="scss"></style>
+<style src="@material/list/mdc-list.scss" lang="scss"></style>
+<style src="@material/form-field/mdc-form-field.scss" lang="scss"></style>
 
 <style lang="scss">
 
@@ -252,5 +289,19 @@ $mdc-theme-background: #fff;
     font-weight: 500;
   }
 }
+
+.two-columns {
+  -webkit-column-count: 2;
+  -webkit-column-gap: 20px;
+  -moz-column-count: 2;
+  -moz-column-gap: 20px;
+  column-count: 2;
+  column-gap: 20px;
+
+  .mdc-form-field {
+    width: 100%;
+  }
+}
+
 
 </style>

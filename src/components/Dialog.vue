@@ -1,0 +1,67 @@
+<template>
+<aside id="my-mdc-dialog"
+  ref="root"
+  style="visibility:hidden"
+  class="mdc-dialog"
+  role="alertdialog"
+  aria-labelledby="my-mdc-dialog-label"
+  :aria-describedby="ariaDescription">
+  <div class="mdc-dialog__surface">
+    <header class="mdc-dialog__header">
+      <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
+        {{ title }}
+      </h2>
+    </header>
+    <slot class="mdc-dialog__body"></slot>
+    <footer class="mdc-dialog__footer" v-if="useDefaultFooter">
+      <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Decline</button>
+      <button type="button"
+              class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept"
+              @click="accept">Accept</button>
+    </footer>
+  </div>
+  <div class="mdc-dialog__backdrop"></div>
+</aside>
+</template>
+
+<script>
+import {MDCDialog} from '@material/dialog';
+
+export default {
+  name: 'mdc-dialog',
+  props: {
+    title: String,
+    useDefaultFooter: {
+      type: Boolean,
+      default: true
+    },
+    ariaDescription: {
+      type: String,
+      required: false
+    }
+  },
+  data () {
+    return {
+      dialog: null
+    }
+  },
+  mounted () {
+    // wire up MDC components
+    this.dialog = new MDCDialog(this.$refs.root);
+  },
+  methods: {
+    show () {
+      this.dialog.show();
+    },
+    close () {
+      this.dialog.close();
+    },
+    accept () {
+      this.$emit('accept');
+    }
+  }
+}
+</script>
+
+<style src="@material/dialog/mdc-dialog.scss" lang="scss"></style>
+<style src="@material/button/mdc-button.scss" lang="scss"></style>

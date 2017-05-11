@@ -122,23 +122,24 @@ async function getKitTypes () {
   const queryParams = {
     display_fields: [ 'kit_template.name', 'kit_template.kit_template_id' ],
     criteria: [ 'kit_template.name!=@@Missing' ],
-    sort: [ 'kit_template.study_id', 'kit_template.name' ],
+    sort_fields: [ 'kit_template.study_id', 'kit_template.name' ],
     limit: 0
   };
 
   var result = await bsiQuery(queryParams);
-  return result.map((row) => { return { name: row[0], value: row[1] }; });
+  return result.map(row => { return { name: row[0], value: row[1] }; });
 }
 
 async function getStatusLabels () {
   const queryParams = {
-    display_fields: [ 'lkup_kit_status.label' ],
+    display_fields: [ 'lkup_kit_status.label', 'lkup_kit_status.status_id' ],
     criteria: [ 'lkup_kit_status.label!=@@Missing' ],
-    sort: [],
+    sort_fields: [ 'lkup_kit_status.status_id' ],
     limit: 0
   };
 
-  return await bsiQuery(queryParams);
+  var result = await bsiQuery(queryParams);
+  return result.map(row => { return { label: row[0], id: parseInt(row[1]) }; });
 }
 
 // Read in label configs
@@ -236,7 +237,7 @@ app.get('/api/kitTypes', async function (request, response) {
   }
 });
 
-app.get('/api/statusLabels', async function (request, response) {
+app.get('/api/kitStatuses', async function (request, response) {
   try {
     response.json(await cachedData.statusLabels);
   } catch (error) {
@@ -248,7 +249,7 @@ app.get('/api/kits', async function (request, response) {
   const queryParams = {
     display_fields: ['kit.label', '+kit.status', '+kit_component.supply_type'],
     criteria: [ `kit_template.kit_template_id=${request.query.kitType}`, `kit.status=${request.query.kitStatus}` ],
-    sort: [],
+    sort_fields: [],
     limit: 10000
   };
 
