@@ -4,7 +4,7 @@
     <toolbar title="Kit labels">
       <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark"
           value="Select kit type"
-          @input="value => { fetchKitComponents(value, selectedStatuses); }"
+          @input="value => { selectedKitType = value; fetchKitComponents(); }"
           :options="kitTypes">
         <template scope="item">
           <li class="mdc-list-item" role="option" :id="item.optionValue" tabindex="0">
@@ -38,7 +38,7 @@
           <hr class="mdc-list-divider">
           <nav class="mdc-list">
             <a class="mdc-list-item" @click="$refs.statuses.show()">
-              Select statuses...
+              Select kit statuses...
             </a>
           </nav>
         </div>
@@ -91,11 +91,17 @@
           <section id="my-mdc-dialog-description" class="mdc-dialog__body">
             <div class="two-columns">
               <div v-for="status in kitStatuses" class="mdc-form-field">
-                <mdc-checkbox :id="'my-checkbox-'+status.id" :labelId="'my-checkbox-label-'+status.id" :value="status.id" v-model="selectedStatuses" />
+                <mdc-checkbox :id="'my-checkbox-'+status.id" :labelId="'my-checkbox-label-'+status.id" :value="status.id" v-model="selectedKitStatuses" />
                 <label :id="'my-checkbox-label-'+status.id" :for="'my-checkbox-'+status.id">{{ status.label }}</label>
               </div>
             </div>
           </section>
+          <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button"
+                    @click="() => { fetchKitComponents(); $refs.statuses.close(); }">
+              Update
+            </button>
+          </footer>
         </mdc-dialog>
       </main>
     </div>
@@ -120,11 +126,12 @@ export default {
   data () {
     return {
       kitTypes: [],
+      selectedKitType: null,
       kitStatuses: [],
       kitComponents: [],
       loading: false,
       dataTable: null,
-      selectedStatuses: []
+      selectedKitStatuses: []
     }
   },
   computed: {
@@ -146,10 +153,25 @@ export default {
     }
   },
   methods: {
-    fetchKitComponents (kitType, kitStatuses) {
+    fetchKitComponents () {
       var vm = this;
+      if (!vm.selectedKitType || vm.selectedKitStatuses.length === 0) {
+        if (!vm.selectedKitType) {
+          vm.$root.$emit('notify', {
+            message: 'You must first select a kit type.',
+            timeout: 3000
+          });
+        }
+        if (vm.selectedKitStatuses.length === 0) {
+          vm.$root.$emit('notify', {
+            message: 'You must select at least one kit status.',
+            timeout: 3000
+          });
+        }
+        return;
+      }
       vm.loading = true;
-      fetch('api/kits?kitType=' + kitType + '&kitStatus=' + kitStatuses.join(';'))
+      fetch('api/kits?kitType=' + vm.selectedKitType + '&kitStatus=' + vm.selectedKitStatuses.join(';'))
       .then(function (response) {
         vm.loading = false;
         if (response.ok) {
@@ -163,7 +185,7 @@ export default {
           vm.$root.$emit('notify', {
             message: 'Fetch kit data failed.',
             actionHandler: () => {
-              vm.fetchKitComponents(kitType, kitStatuses);
+              vm.fetchKitComponents();
             },
             actionText: 'Retry',
             timeout: 5000

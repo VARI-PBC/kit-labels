@@ -14,10 +14,12 @@
     </header>
     <slot class="mdc-dialog__body"></slot>
     <footer class="mdc-dialog__footer" v-if="useDefaultFooter">
-      <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Decline</button>
+      <button type="button"
+              class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel"
+              @click="$emit('cancel')">Cancel</button>
       <button type="button"
               class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept"
-              @click="accept">Accept</button>
+              @click="$emit('accept')">Accept</button>
     </footer>
   </div>
   <div class="mdc-dialog__backdrop"></div>
@@ -55,9 +57,6 @@ export default {
     },
     close () {
       this.dialog.close();
-    },
-    accept () {
-      this.$emit('accept');
     }
   }
 }
