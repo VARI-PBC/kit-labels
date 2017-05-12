@@ -1,7 +1,10 @@
 <template>
   <body id="app" class="mdc-typography">
     <!-- Header -->
-    <toolbar title="Kit labels">
+    <toolbar>
+      <button slot="section-start" class="drawer-menu material-icons"
+              @click="() => {drawer.open = !drawer.open;}">menu</button>
+      <span slot="section-start" class="mdc-toolbar__title catalog-title">Kit labels</span>
       <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark"
           value="Select kit type"
           @input="value => { selectedKitType = value; fetchKitComponents(); }"
@@ -19,30 +22,23 @@
     </toolbar>
     <div class="content mdc-toolbar-fixed-adjust">
       <!-- Navigation -->
-      <nav ref="drawer" class="mdc-permanent-drawer">
-        <div class="mdc-list-group">
-          <nav class="mdc-list">
-            <a class="mdc-list-item mdc-permanent-drawer--selected" href="#">
-              Group by kits
-            </a>
-            <a class="mdc-list-item" href="#">
-              Group by components
-            </a>
-          </nav>
-          <hr class="mdc-list-divider">
-          <nav class="mdc-list">
-            <a class="mdc-list-item" href="#">
-              Kit manifests
-            </a>
-          </nav>
-          <hr class="mdc-list-divider">
-          <nav class="mdc-list">
-            <a class="mdc-list-item" @click="$refs.statuses.show()">
-              Select kit statuses...
-            </a>
-          </nav>
-        </div>
-      </nav>
+      <aside class="mdc-persistent-drawer" ref="drawer">
+        <nav class="mdc-persistent-drawer__drawer">
+          <div class="mdc-list-group">
+            <nav class="mdc-list">
+              <a class="mdc-list-item mdc-persistent-drawer--selected" href="#">
+                Kits/components
+              </a>
+            </nav>
+            <hr class="mdc-list-divider">
+            <nav class="mdc-list">
+              <a class="mdc-list-item" @click="$refs.statuses.show()">
+                Select kit statuses...
+              </a>
+            </nav>
+          </div>
+        </nav>
+      </aside>
       <!-- Main content -->
       <main class="main">
         <template v-for="items in kits">
@@ -113,6 +109,7 @@
 import Toolbar from './components/Toolbar';
 import mdcSelect from './components/Select';
 import {MDCTextfield} from '@material/textfield';
+import {MDCPersistentDrawer} from '@material/drawer';
 import Snackbar from './components/Snackbar';
 import mdcDialog from './components/Dialog';
 import mdcCheckbox from './components/Checkbox';
@@ -122,7 +119,7 @@ require('./assets/mdl/checkbox/checkbox');
 
 export default {
   name: 'app',
-  components: { Toolbar, mdcSelect, Snackbar, mdcDialog, mdcCheckbox },
+  components: { Toolbar, mdcSelect, MDCPersistentDrawer, Snackbar, mdcDialog, mdcCheckbox },
   data () {
     return {
       kitTypes: [],
@@ -240,6 +237,7 @@ export default {
   mounted () {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
+    this.drawer = MDCPersistentDrawer.attachTo(this.$refs.drawer)
   },
   updated () {
     if (this.$refs.componentsTables !== undefined && this.$refs.componentsTables.length > 0) {
@@ -259,7 +257,7 @@ $mdc-theme-background: #fff;
 
 <style src="@material/typography/mdc-typography.scss" lang="scss"></style>
 <style src="@material/textfield/mdc-textfield.scss" lang="scss"></style>
-<style src="@material/drawer/permanent/mdc-permanent-drawer.scss" lang="scss"></style>
+<style src="@material/drawer/persistent/mdc-persistent-drawer.scss" lang="scss"></style>
 <style src="@material/button/mdc-button.scss" lang="scss"></style>
 <style src="./assets/mdl/data-table/data-table.scss" lang="scss"></style>
 <style src="./assets/mdl/checkbox/checkbox.scss" lang="scss"></style>
@@ -271,6 +269,19 @@ $mdc-theme-background: #fff;
 .material-icons {
   text-decoration: none;
   cursor: pointer;
+}
+
+/* A simple menu button. */
+.drawer-menu {
+  background: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin: 0;
+  margin-right: 24px;
+  color: #FFF;
+  box-sizing: border-box;
 }
 
 /* Place drawer and main next to each other. */
