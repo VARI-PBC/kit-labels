@@ -41,38 +41,28 @@
       </aside>
       <!-- Main content -->
       <main class="main">
-        <template v-for="items in kits">
-          <p></p>
-          <table class="mdl-data-table">
-            <thead>
-              <tr>
-                <th class="mdl-data-table__cell--non-numeric">Kit label</th>
-                <th class="mdl-data-table__cell--non-numeric">Kit status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="mdl-data-table__cell--non-numeric">{{ items[0].kitLabel }}</td>
-                <td class="mdl-data-table__cell--non-numeric">{{ items[0].kitStatus }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p></p>
-          <table ref="componentsTables" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
-            <thead>
-              <tr>
-                <th class="mdl-data-table__cell--non-numeric">Component</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in items">
-                <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
-                <td>{{ item.quantity }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </template>
+        <details class="mdl-expansion" v-for="items in kits" >
+          <summary class="mdl-expansion__summary">
+            <span class="mdl-expansion__header">{{ items[0].kitLabel }}</span>
+            <span class="mdl-expansion__secondary-content">{{ items[0].kitStatus }}</span>
+          </summary>
+          <div  class="mdl-expansion__content">
+            <table ref="componentsTables" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
+              <thead>
+                <tr>
+                  <th class="mdl-data-table__cell--non-numeric">Component</th>
+                  <th>Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in items">
+                  <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
+                  <td>{{ item.quantity }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
         <button id="print-selected" 
                 @click="printSelected" 
                 class="mdc-button mdc-button--accent mdc-button--raised">
@@ -294,6 +284,7 @@ $mdc-theme-background: #fff;
 .main {
   margin-left: auto;
   margin-right: auto;
+  padding: 24px;
 }
 
 .mdc-textfield.search-box {
@@ -340,5 +331,100 @@ $mdc-theme-background: #fff;
   }
 }
 
+.mdl-expansion {
+  border-bottom: 1px solid rgba(0, 0, 0, .12);
+  /** Just for demo **/
+  width: 700px;
+  box-sizing: border-box;
+  
+  &__summary {
+    padding: 6px 24px;
+    height: 48px;
+    display: flex;
+    outline: none;
+    
+    &::-webkit-details-marker {
+      display: none;
+    }
+    
+    &::after {
+      font-family: 'Material Icons';
+      content: '\e313';
+      font-size: 24px;
+      font-weight: normal;
+      font-style: normal;
+      display: inline-flex;
+      flex-direction: column;
+      user-select: none;
+      justify-content: center;
+      transition: transform 200ms, color 200ms;
+      margin-left: auto;
+      color: rgba(0, 0, 0, .38);
+    }
+    
+    &:focus {
+      /* Grey 200 */
+      background-color: #EEEEEE;
+      
+      &::after {
+        color: rgba(0, 0, 0, .54);
+      }
+    }
+  }
+  
+  &__header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    flex-basis: 30%;
+    margin-right: 16px;
+  }
+  
+  &__subheader {
+    font-size: .75rem;
+    color: rgba(0, 0, 0, .54);
+  }
+  
+  &__secondary-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    flex-basis: 30%;
+    color: rgba(0, 0, 0, .87);
+    margin-right: 16px;
+  }
+
+  &__content {
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    
+    & + .mdl-expansion__actions {
+      border-top: 1px solid rgba(0, 0, 0, .12);
+    }
+  }
+  
+  &__actions {
+    display: flex;
+    flex-direction: row-reverse;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  
+  &__action {
+    margin-right: 8px;
+  }
+  
+  &[open] {
+    .mdl-expansion__summary::after {
+        transform: rotate(180deg);
+    }
+  } 
+}
 
 </style>
