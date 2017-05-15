@@ -128,7 +128,7 @@ export default {
       kitComponents: [],
       loading: false,
       dataTable: null,
-      selectedKitStatuses: []
+      selectedKitStatuses: [1]
     }
   },
   computed: {
