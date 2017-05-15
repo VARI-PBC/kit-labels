@@ -321,6 +321,10 @@ $mdc-theme-background: #fff;
     color: rgb(117,117,117);
     font-weight: 500;
   }
+
+  .mdl-checkbox, .mdl-checkbox__box-outline {
+    z-index: 0;
+  }
 }
 
 .two-columns {
