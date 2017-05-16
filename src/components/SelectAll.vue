@@ -1,28 +1,28 @@
 <template>
-    <checkbox v-model="selectAllItems">
-    </checkbox>
+    <mdc-checkbox v-model="selectAllItems"></mdc-checkbox>
 </template>
 
 <script>
-import Checkbox from './Checkbox'
+import mdcCheckbox from './Checkbox'
 
 export default {
   name: 'select-all',
-  components: {
-    Checkbox
-  },
+  components: { mdcCheckbox },
   props: {
-    items: Array
+    items: Array,
+    selectedKey: String
   },
   computed: {
     selectAllItems: {
       get () {
-        return this.items.length > 0 &&
-          this.items.every(item => item.selected === true);
+        var vm = this;
+        return vm.items.length > 0 &&
+          vm.items.every(item => item[vm.selectedKey] === true);
       },
       set (value) {
-        this.items.forEach(function (item) {
-          item.selected = value;
+        var vm = this;
+        vm.items.forEach(function (item) {
+          item[vm.selectedKey] = value;
         });
       }
     }

@@ -41,21 +41,21 @@
       </aside>
       <!-- Main content -->
       <main class="main">
-        <details class="mdl-expansion" v-for="items in kits" >
-          <summary class="mdl-expansion__summary">
-            <span class="mdl-expansion__header">{{ items[0].kitLabel }}</span>
-            <span class="mdl-expansion__secondary-content">{{ items[0].kitStatus }}</span>
+        <details class="mdc-expansion" v-for="items in kits" >
+          <summary class="mdc-expansion__summary">
+            <div class="mdc-expansion__centered-content">
+              <select-all :items="items" :selectedKey="'selected'"></select-all>
+            </div>
+            <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
+            <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
           </summary>
-          <div  class="mdl-expansion__content">
-            <table ref="componentsTables" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
-              <thead>
-                <tr>
-                  <th class="mdl-data-table__cell--non-numeric">Component</th>
-                  <th>Quantity</th>
-                </tr>
-              </thead>
+          <div  class="mdc-expansion__content">
+            <table ref="componentsTables" class="mdl-data-table">
               <tbody>
                 <tr v-for="item in items">
+                  <td>
+                    <mdc-checkbox v-model="item.selected" />
+                  </td>
                   <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
                   <td>{{ item.quantity }}</td>
                 </tr>
@@ -95,7 +95,6 @@
 </template>
 
 <script>
-/* global componentHandler */
 import Toolbar from './components/Toolbar';
 import mdcSelect from './components/Select';
 import {MDCTextfield} from '@material/textfield';
@@ -103,13 +102,11 @@ import {MDCPersistentDrawer} from '@material/drawer';
 import Snackbar from './components/Snackbar';
 import mdcDialog from './components/Dialog';
 import mdcCheckbox from './components/Checkbox';
-require('./assets/mdl/mdlComponentHandler');
-require('./assets/mdl/data-table/data-table');
-require('./assets/mdl/checkbox/checkbox');
+import SelectAll from './components/SelectAll';
 
 export default {
   name: 'app',
-  components: { Toolbar, mdcSelect, MDCPersistentDrawer, Snackbar, mdcDialog, mdcCheckbox },
+  components: { Toolbar, mdcSelect, MDCPersistentDrawer, Snackbar, mdcDialog, mdcCheckbox, SelectAll },
   data () {
     return {
       kitTypes: [],
@@ -228,11 +225,6 @@ export default {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
     this.drawer = MDCPersistentDrawer.attachTo(this.$refs.drawer)
-  },
-  updated () {
-    if (this.$refs.componentsTables !== undefined && this.$refs.componentsTables.length > 0) {
-      componentHandler.upgradeElements(this.$refs.componentsTables);
-    }
   }
 }
 </script>
@@ -250,9 +242,9 @@ $mdc-theme-background: #fff;
 <style src="@material/drawer/persistent/mdc-persistent-drawer.scss" lang="scss"></style>
 <style src="@material/button/mdc-button.scss" lang="scss"></style>
 <style src="./assets/mdl/data-table/data-table.scss" lang="scss"></style>
-<style src="./assets/mdl/checkbox/checkbox.scss" lang="scss"></style>
 <style src="@material/list/mdc-list.scss" lang="scss"></style>
 <style src="@material/form-field/mdc-form-field.scss" lang="scss"></style>
+<style src="./components/mdc-expansion.scss" lang="scss"></style>
 
 <style lang="scss">
 
@@ -312,10 +304,6 @@ $mdc-theme-background: #fff;
     color: rgb(117,117,117);
     font-weight: 500;
   }
-
-  .mdl-checkbox, .mdl-checkbox__box-outline {
-    z-index: 0;
-  }
 }
 
 .two-columns {
@@ -329,102 +317,6 @@ $mdc-theme-background: #fff;
   .mdc-form-field {
     width: 100%;
   }
-}
-
-.mdl-expansion {
-  border-bottom: 1px solid rgba(0, 0, 0, .12);
-  /** Just for demo **/
-  width: 700px;
-  box-sizing: border-box;
-  
-  &__summary {
-    padding: 6px 24px;
-    height: 48px;
-    display: flex;
-    outline: none;
-    
-    &::-webkit-details-marker {
-      display: none;
-    }
-    
-    &::after {
-      font-family: 'Material Icons';
-      content: '\e313';
-      font-size: 24px;
-      font-weight: normal;
-      font-style: normal;
-      display: inline-flex;
-      flex-direction: column;
-      user-select: none;
-      justify-content: center;
-      transition: transform 200ms, color 200ms;
-      margin-left: auto;
-      color: rgba(0, 0, 0, .38);
-    }
-    
-    &:focus {
-      /* Grey 200 */
-      background-color: #EEEEEE;
-      
-      &::after {
-        color: rgba(0, 0, 0, .54);
-      }
-    }
-  }
-  
-  &__header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    flex-basis: 30%;
-    margin-right: 16px;
-  }
-  
-  &__subheader {
-    font-size: .75rem;
-    color: rgba(0, 0, 0, .54);
-  }
-  
-  &__secondary-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    flex-basis: 30%;
-    color: rgba(0, 0, 0, .87);
-    margin-right: 16px;
-  }
-
-  &__content {
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-top: 16px;
-    padding-bottom: 16px;
-    
-    & + .mdl-expansion__actions {
-      border-top: 1px solid rgba(0, 0, 0, .12);
-    }
-  }
-  
-  &__actions {
-    display: flex;
-    flex-direction: row-reverse;
-    padding-top: 16px;
-    padding-bottom: 16px;
-  }
-  
-  &__action {
-    margin-right: 8px;
-  }
-  
-  &[open] {
-    .mdl-expansion__summary::after {
-        transform: rotate(180deg);
-    }
-  } 
 }
 
 </style>
