@@ -5,7 +5,8 @@
   :class="classes"
   @MDCSelect:change="onChange">
   <span class="mdc-select__selected-text">{{value}}</span>
-  <div class="mdc-simple-menu mdc-select__menu">
+  <div class="mdc-simple-menu mdc-select__menu"
+      @MDCSimpleMenu:selected="onSelected">
     <ul class="mdc-list mdc-simple-menu__items">
       <slot
         v-for="option in options"
@@ -48,6 +49,9 @@ export default {
   methods: {
     onChange () {
       this.$emit('input', this.select.value);
+    },
+    onSelected () {
+      this.$emit('selected', this.select.value);
     }
   }
 }

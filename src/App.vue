@@ -6,8 +6,8 @@
               @click="() => {drawer.open = !drawer.open;}">menu</button>
       <span slot="section-start" class="mdc-toolbar__title catalog-title">Kit labels</span>
       <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark"
-          value="Select kit type"
-          @input="value => { selectedKitType = value; fetchKitComponents(); }"
+          v-model="selectedKitType"
+          @selected="fetchKitComponents"
           :options="kitTypes">
         <template scope="item">
           <li class="mdc-list-item" role="option" :id="item.optionValue" tabindex="0">
@@ -110,7 +110,7 @@ export default {
   data () {
     return {
       kitTypes: [],
-      selectedKitType: null,
+      selectedKitType: 'Select kit type',
       kitStatuses: [],
       kitComponents: [],
       loading: false,
