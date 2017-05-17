@@ -61,7 +61,7 @@
           <div  class="mdc-expansion__content">
             <table ref="componentsTables" class="mdl-data-table">
               <tbody>
-                <tr v-for="item in items">
+                <tr v-for="item in items" @click="item.selected = !item.selected">
                   <td>
                     <mdc-checkbox v-model="item.selected" />
                   </td>
