@@ -41,6 +41,15 @@
       </aside>
       <!-- Main content -->
       <main class="main">
+        <div class="table-header">
+          <div class="table-header__summary">
+            <div class="table-header__centered-content">
+              <select-all :items="kitComponents" :selectedKey="'selected'"></select-all>
+            </div>
+            <span class="table-header__header">Kit label</span>
+            <span class="table-header__secondary-content">Status</span>
+          </div>
+        </div>
         <details class="mdc-expansion" v-for="items in kits" >
           <summary class="mdc-expansion__summary">
             <div class="mdc-expansion__centered-content">
@@ -316,6 +325,55 @@ $mdc-theme-background: #fff;
 
   .mdc-form-field {
     width: 100%;
+  }
+}
+
+.table-header {
+  border-bottom: 1px solid rgba(0, 0, 0, .12);
+  /** Just for demo **/
+  width: 700px;
+  box-sizing: border-box;
+  background-color: rgb(224,224,224);
+
+  &__summary {
+    padding: 6px 24px;
+    height: 48px;
+    display: flex;
+    outline: none;
+  }
+  
+  &__header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    flex-basis: 30%;
+    color: rgba(0, 0, 0, .45);
+    margin-right: 16px;
+  }
+  
+  &__subheader {
+    font-size: .75rem;
+    color: rgba(0, 0, 0, .54);
+  }
+  
+  &__secondary-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    flex-basis: 30%;
+    color: rgba(0, 0, 0, .45);
+    margin-right: 16px;
+  }
+
+  &__centered-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-right: 16px;
   }
 }
 
