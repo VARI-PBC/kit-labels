@@ -50,8 +50,8 @@ export default {
     onChange () {
       this.$emit('input', this.select.value);
     },
-    onSelected () {
-      this.$emit('selected', this.select.value);
+    onSelected (event) {
+      this.$emit('selected', event.detail.item.id);
     }
   }
 }

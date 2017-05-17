@@ -41,7 +41,7 @@
       </aside>
       <!-- Main content -->
       <main class="main">
-        <div class="table-header">
+        <div class="table-header" v-if="Object.keys(kits).length > 0">
           <div class="table-header__summary">
             <div class="table-header__centered-content">
               <select-all :items="kitComponents" :selectedKey="'selected'"></select-all>
@@ -50,7 +50,7 @@
             <span class="table-header__secondary-content">Status</span>
           </div>
         </div>
-        <details class="mdc-expansion" v-for="items in kits" >
+        <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" >
           <summary class="mdc-expansion__summary">
             <div class="mdc-expansion__centered-content">
               <select-all :items="items" :selectedKey="'selected'"></select-all>
@@ -146,7 +146,8 @@ export default {
     }
   },
   methods: {
-    fetchKitComponents () {
+    fetchKitComponents (kitType) {
+      if (kitType) this.selectedKitType = kitType;
       var vm = this;
       if (!vm.selectedKitType || vm.selectedKitStatuses.length === 0) {
         if (!vm.selectedKitType) {
