@@ -5,8 +5,8 @@ var fs = require('fs');
 var path = require('path');
 const config = require('./backendConfig');
 var fp = require('lodash/fp');
-const https = require('https');
-const querystring = require('querystring');
+//const https = require('https');
+//const querystring = require('querystring');
 
 // Create an express app
 var express = require('express');
@@ -14,6 +14,11 @@ var app = express();
 
 // Serve files from the dist directory
 app.use('/', express.static(path.resolve(__dirname, 'dist')));
+
+var ReportType = {
+  LIST: 1,
+  FREQUENCY: 2
+};
 
 // memoized global variables
 var cachedData = {
@@ -28,9 +33,9 @@ var cachedData = {
     this.kitTypes = getKitTypes();
     return this.kitTypes;
   },
-  get statusLabels () {
+  get kitStatusLabels () {
     delete this.statusLabels;
-    this.statusLabels = getStatusLabels();
+    this.statusLabels = getKitStatusLabels();
     return this.statusLabels;
   },
   get kitConfigs () {
@@ -40,7 +45,10 @@ var cachedData = {
   }
 }
 
-// log on to BSI
+var xmlrpc = require('xmlrpc');
+var client = xmlrpc.createSecureClient(config.bsi.url);
+
+/* log on to BSI
 async function logon () {
   const options = {
     hostname: config.bsi.hostname,
@@ -74,8 +82,22 @@ async function logon () {
     req.end();
   });
 }
+*/
+async function logon () {
+  return new Promise((resolve, reject) => {
+    var logonArgs = [config.bsi.logonArgs.user_name, config.bsi.logonArgs.password, config.bsi.database];
+    client.methodCall('common.logon', logonArgs, function (error, d) {
+      if (error) {
+        console.error(error);
+        reject(error['message']);
+      } else {
+        resolve(d);
+      }
+    });
+  });
+}
 
-// wrap BSI reporting interface
+/* wrap BSI reporting interface
 async function bsiQuery (queryParams) {
   const options = {
     hostname: config.bsi.hostname,
@@ -117,25 +139,45 @@ async function bsiQuery (queryParams) {
     req.end();
   });
 }
+*/
+async function bsiQuery (queryParams) {
+  var params = [await cachedData.sessionId, queryParams.criteria, queryParams.display_fields, queryParams.sort_fields, queryParams.limit, queryParams.report_type];
+  return new Promise((resolve, reject) => {
+    client.methodCall('report.execute', params, function (error, result) {
+      if (error) {
+        if (error['code'] === 9000) {
+          delete cachedData._sessionId;
+        }
+        reject(error['message']);
+      } else {
+        resolve(result['rows']);
+      }
+    });
+  });
+}
 
 async function getKitTypes () {
   const queryParams = {
     display_fields: [ 'kit_template.name', 'kit_template.kit_template_id' ],
-    criteria: [ 'kit_template.name!=@@Missing' ],
+    //criteria: [ 'kit_template.name!=@@Missing' ],
+    criteria: [{ value: '@@Missing', operator: 'not equals', field: 'kit_template.name' }],
     sort_fields: [ 'kit_template.study_id', 'kit_template.name' ],
-    limit: 0
+    limit: 0,
+    report_type: ReportType.LIST
   };
 
   var result = await bsiQuery(queryParams);
   return result.map(row => { return { name: row[0], value: row[1] }; });
 }
 
-async function getStatusLabels () {
+async function getKitStatusLabels () {
   const queryParams = {
     display_fields: [ 'lkup_kit_status.label', 'lkup_kit_status.status_id' ],
-    criteria: [ 'lkup_kit_status.label!=@@Missing' ],
+    //criteria: [ 'lkup_kit_status.label!=@@Missing' ],
+    criteria: [{ value: '@@Missing', operator: 'not equals', field: 'lkup_kit_status.label' }],
     sort_fields: [ 'lkup_kit_status.status_id' ],
-    limit: 0
+    limit: 0,
+    report_type: ReportType.LIST
   };
 
   var result = await bsiQuery(queryParams);
@@ -239,7 +281,7 @@ app.get('/api/kitTypes', async function (request, response) {
 
 app.get('/api/kitStatuses', async function (request, response) {
   try {
-    response.json(await cachedData.statusLabels);
+    response.json(await cachedData.kitStatusLabels);
   } catch (error) {
     response.status(500).json(error);
   }
@@ -248,9 +290,11 @@ app.get('/api/kitStatuses', async function (request, response) {
 app.get('/api/kits', async function (request, response) {
   const queryParams = {
     display_fields: ['kit.label', '+kit.status', '+kit_component.supply_type'],
-    criteria: [ `kit_template.kit_template_id=${request.query.kitType}`, `kit.status=${request.query.kitStatus}` ],
+    //criteria: [ `kit_template.kit_template_id=${request.query.kitType}`, `kit.status=${request.query.kitStatus}` ],
+    criteria: [{value: request.query.kitStatus, operator: 'equals', field: 'kit.status'}, {value: request.query.kitType, operator: 'equals', field: 'kit_template.kit_template_id'}],
     sort_fields: [],
-    limit: 10000
+    limit: 10000,
+    report_type: ReportType.FREQUENCY
   };
 
   try {
