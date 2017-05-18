@@ -43,20 +43,18 @@
       <main class="main">
         <div class="table-header" v-if="Object.keys(kits).length > 0">
           <div class="table-header__summary">
-            <div class="table-header__centered-content">
-              <select-all :items="kitComponents" :selectedKey="'selected'"></select-all>
-            </div>
+            <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
             <span class="table-header__header">Kit label</span>
             <span class="table-header__secondary-content">Status</span>
           </div>
         </div>
         <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" >
           <summary class="mdc-expansion__summary">
-            <div class="mdc-expansion__centered-content">
-              <select-all :items="items" :selectedKey="'selected'"></select-all>
+            <div>
+              <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
+              <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
+              <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
             </div>
-            <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
-            <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
           </summary>
           <div  class="mdc-expansion__content">
             <table ref="componentsTables" class="mdl-data-table">
@@ -341,6 +339,7 @@ $mdc-theme-background: #fff;
     height: 48px;
     display: flex;
     outline: none;
+    align-items: center;
   }
   
   &__header {
@@ -367,13 +366,6 @@ $mdc-theme-background: #fff;
     font-weight: 700;
     flex-basis: 30%;
     color: rgba(0, 0, 0, .45);
-    margin-right: 16px;
-  }
-
-  &__centered-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     margin-right: 16px;
   }
 }
