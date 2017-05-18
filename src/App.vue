@@ -40,36 +40,51 @@
         </nav>
       </aside>
       <!-- Main content -->
-      <main class="main">
-        <div class="table-header" v-if="Object.keys(kits).length > 0">
-          <div class="table-header__summary">
-            <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
-            <span class="table-header__header">Kit label</span>
-            <span class="table-header__secondary-content">Status</span>
-          </div>
-        </div>
-        <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" >
-          <summary class="mdc-expansion__summary">
-            <div>
-              <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
-              <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
-              <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
+  <main class="main">
+    <section id="dynamic-demo-toolbar">
+      <nav ref="tabs" id="dynamic-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist" @MDCTabBar:change="updatePanel">
+        <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
+        <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
+        <span class="mdc-tab-bar__indicator"></span>
+      </nav>
+    </section>
+    <section>
+      <div ref="panels">
+        <div class="panel active" id="panel-1" role="tabpanel" aria-hidden="false">
+          <div class="table-header" v-if="Object.keys(kits).length > 0">
+            <div class="table-header__summary">
+              <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
+              <span class="table-header__header">Kit label</span>
+              <span class="table-header__secondary-content">Status</span>
             </div>
-          </summary>
-          <div  class="mdc-expansion__content">
-            <table ref="componentsTables" class="mdl-data-table">
-              <tbody>
-                <tr v-for="item in items" @click.capture="item.selected = !item.selected">
-                  <td>
-                    <mdc-checkbox v-model="item.selected" />
-                  </td>
-                  <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
-                  <td>{{ item.quantity }}</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
-        </details>
+          <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel">
+            <summary class="mdc-expansion__summary">
+              <div>
+                <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
+                <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
+                <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
+              </div>
+            </summary>
+            <div class="mdc-expansion__content">
+              <table ref="componentsTables" class="mdl-data-table">
+                <tbody>
+                  <tr v-for="item in items" @click.capture="item.selected = !item.selected">
+                    <td>
+                      <mdc-checkbox v-model="item.selected" />
+                    </td>
+                    <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
+                    <td>{{ item.quantity }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+        <div class="panel" id="panel-2" role="tabpanel" aria-hidden="true">Item Two</div>
+      </div>
+    </section>
+
         <button id="print-selected" 
                 @click="printSelected" 
                 class="mdc-button mdc-button--accent mdc-button--raised">
@@ -110,12 +125,14 @@ import Snackbar from './components/Snackbar';
 import mdcDialog from './components/Dialog';
 import mdcCheckbox from './components/Checkbox';
 import SelectAll from './components/SelectAll';
+import {MDCTabBar, MDCTabFoundation} from '@material/tabs';
 
 export default {
   name: 'app',
-  components: { Toolbar, mdcSelect, MDCPersistentDrawer, Snackbar, mdcDialog, mdcCheckbox, SelectAll },
+  components: { Toolbar, mdcSelect, MDCPersistentDrawer, Snackbar, mdcDialog, mdcCheckbox, SelectAll, MDCTabBar, MDCTabFoundation },
   data () {
     return {
+      panels: [],
       kitTypes: [],
       selectedKitType: 'Select kit type',
       kitStatuses: [],
@@ -144,6 +161,18 @@ export default {
     }
   },
   methods: {
+    updatePanel () {
+      var vm = this;
+      console.log(vm);
+      var activePanel = document.querySelector('.panel.active');
+      if (activePanel) {
+        activePanel.classList.remove('active');
+      }
+      var newActivePanel = document.querySelector('.panel:nth-child(' + (vm.tabs.activeTabIndex + 1) + ')');
+      if (newActivePanel) {
+        newActivePanel.classList.add('active');
+      }
+    },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
       var vm = this;
@@ -227,14 +256,16 @@ export default {
           timeout: 5000
         });
       }
-    })
+    });
   },
   mounted () {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
     this.drawer = MDCPersistentDrawer.attachTo(this.$refs.drawer)
+    this.tabs = MDCTabBar.attachTo(this.$refs.tabs)
   }
 }
+
 </script>
 
 <style lang="scss">
@@ -252,6 +283,7 @@ $mdc-theme-background: #fff;
 <style src="./assets/mdl/data-table/data-table.scss" lang="scss"></style>
 <style src="@material/list/mdc-list.scss" lang="scss"></style>
 <style src="@material/form-field/mdc-form-field.scss" lang="scss"></style>
+<style src="@material/tabs/mdc-tabs.scss" lang="scss"></style>
 <style src="./components/mdc-expansion.scss" lang="scss"></style>
 
 <style lang="scss">
@@ -370,4 +402,17 @@ $mdc-theme-background: #fff;
   }
 }
 
+
+.panels {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-top: 8px;
+      }
+      .panel {
+        display: none;
+      }
+      .panel.active {
+        display: block;
+      }
 </style>
