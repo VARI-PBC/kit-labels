@@ -19,8 +19,8 @@
     <div class="content mdc-toolbar-fixed-adjust">
       <!-- Main content -->
       <main class="main">
-        <section id="dynamic-demo-toolbar">
-          <nav ref="tabs" id="dynamic-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist" @MDCTabBar:change="updatePanel">
+        <section id="tab-nav">
+          <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist" @MDCTabBar:change="updatePanel">
             <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
             <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
             <span class="mdc-tab-bar__indicator"></span>
@@ -339,6 +339,23 @@ $mdc-theme-background: #fff;
     background-color: rgb(224,224,224);
     color: rgb(117,117,117);
     font-weight: 500;
+  }
+}
+
+.mdc-expansion__content {
+  .mdl-data-table {
+    tbody {
+        tr {
+          td:first-child {
+            width: 10%;
+          }
+          td:last-child {
+            width: 20%;
+          }
+        }
+      }
+
+    width: 100%;
   }
 }
 
