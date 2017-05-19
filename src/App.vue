@@ -2,7 +2,6 @@
   <body id="app" class="mdc-typography">
     <!-- Header -->
     <toolbar>
-      <button slot="section-start" class="drawer-menu material-icons" @click="() => {drawer.open = !drawer.open;}">menu</button>
       <span slot="section-start" class="mdc-toolbar__title catalog-title">Kit labels</span>
       <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark" v-model="selectedKitType" @selected="fetchKitComponents" :options="kitTypes">
         <template scope="item">
@@ -15,26 +14,9 @@
         <input type="text" class="mdc-textfield__input mdc-theme--text-primary-on-dark">
         <span class="mdc-textfield__label mdc-theme--text-secondary-on-dark">Search kits</span>
       </label>
+      <button slot="section-end" class="toolbar-button material-icons"  @click="$refs.statuses.show()">settings</button>
     </toolbar>
     <div class="content mdc-toolbar-fixed-adjust">
-      <!-- Navigation -->
-      <aside class="mdc-persistent-drawer" ref="drawer">
-        <nav class="mdc-persistent-drawer__drawer">
-          <div class="mdc-list-group">
-            <nav class="mdc-list">
-              <a class="mdc-list-item mdc-persistent-drawer--selected" href="#">
-                Kits/components
-              </a>
-            </nav>
-            <hr class="mdc-list-divider">
-            <nav class="mdc-list">
-              <a class="mdc-list-item" @click="$refs.statuses.show()">
-                Select kit statuses...
-              </a>
-            </nav>
-          </div>
-        </nav>
-      </aside>
       <!-- Main content -->
       <main class="main">
         <section id="dynamic-demo-toolbar">
@@ -45,7 +27,7 @@
           </nav>
         </section>
         <section>
-          <div ref="panels">
+          <div class="panels" ref="panels">
             <div class="panel active" id="panel-1" role="tabpanel" aria-hidden="false">
               <div class="table-header" v-if="Object.keys(kits).length > 0">
                 <div class="table-header__summary">
@@ -137,7 +119,6 @@
 import Toolbar from './components/Toolbar';
 import mdcSelect from './components/Select';
 import {MDCTextfield} from '@material/textfield';
-import {MDCPersistentDrawer} from '@material/drawer';
 import Snackbar from './components/Snackbar';
 import mdcDialog from './components/Dialog';
 import mdcCheckbox from './components/Checkbox';
@@ -146,7 +127,7 @@ import {MDCTabBar, MDCTabFoundation} from '@material/tabs';
 
 export default {
   name: 'app',
-  components: { Toolbar, mdcSelect, MDCPersistentDrawer, Snackbar, mdcDialog, mdcCheckbox, SelectAll, MDCTabBar, MDCTabFoundation },
+  components: { Toolbar, mdcSelect, Snackbar, mdcDialog, mdcCheckbox, SelectAll, MDCTabBar, MDCTabFoundation },
   data () {
     return {
       panels: [],
@@ -277,7 +258,6 @@ export default {
   mounted () {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
-    this.drawer = MDCPersistentDrawer.attachTo(this.$refs.drawer)
     this.tabs = MDCTabBar.attachTo(this.$refs.tabs)
   }
 }
@@ -310,7 +290,7 @@ $mdc-theme-background: #fff;
 }
 
 /* A simple menu button. */
-.drawer-menu {
+.toolbar-button {
   background: none;
   border: none;
   width: 24px;
