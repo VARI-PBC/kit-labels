@@ -2,13 +2,9 @@
   <body id="app" class="mdc-typography">
     <!-- Header -->
     <toolbar>
-      <button slot="section-start" class="drawer-menu material-icons"
-              @click="() => {drawer.open = !drawer.open;}">menu</button>
+      <button slot="section-start" class="drawer-menu material-icons" @click="() => {drawer.open = !drawer.open;}">menu</button>
       <span slot="section-start" class="mdc-toolbar__title catalog-title">Kit labels</span>
-      <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark"
-          v-model="selectedKitType"
-          @selected="fetchKitComponents"
-          :options="kitTypes">
+      <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark" v-model="selectedKitType" @selected="fetchKitComponents" :options="kitTypes">
         <template scope="item">
           <li class="mdc-list-item" role="option" :id="item.optionValue" tabindex="0">
             {{item.optionName}}
@@ -40,62 +36,84 @@
         </nav>
       </aside>
       <!-- Main content -->
-  <main class="main">
-    <section id="dynamic-demo-toolbar">
-      <nav ref="tabs" id="dynamic-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist" @MDCTabBar:change="updatePanel">
-        <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
-        <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
-        <span class="mdc-tab-bar__indicator"></span>
-      </nav>
-    </section>
-    <section>
-      <div ref="panels">
-        <div class="panel active" id="panel-1" role="tabpanel" aria-hidden="false">
-          <div class="table-header" v-if="Object.keys(kits).length > 0">
-            <div class="table-header__summary">
-              <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
-              <span class="table-header__header">Kit label</span>
-              <span class="table-header__secondary-content">Status</span>
+      <main class="main">
+        <section id="dynamic-demo-toolbar">
+          <nav ref="tabs" id="dynamic-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist" @MDCTabBar:change="updatePanel">
+            <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
+            <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
+            <span class="mdc-tab-bar__indicator"></span>
+          </nav>
+        </section>
+        <section>
+          <div ref="panels">
+            <div class="panel active" id="panel-1" role="tabpanel" aria-hidden="false">
+              <div class="table-header" v-if="Object.keys(kits).length > 0">
+                <div class="table-header__summary">
+                  <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
+                  <span class="table-header__header">Kit label</span>
+                  <span class="table-header__secondary-content">Status</span>
+                </div>
+              </div>
+              <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel">
+                <summary class="mdc-expansion__summary">
+                  <div>
+                    <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
+                    <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
+                    <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
+                  </div>
+                </summary>
+                <div class="mdc-expansion__content">
+                  <table ref="componentsTables" class="mdl-data-table">
+                    <tbody>
+                      <tr v-for="item in items" @click.capture="item.selected = !item.selected">
+                        <td>
+                          <mdc-checkbox v-model="item.selected" />
+                        </td>
+                        <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
+                        <td>{{ item.quantity }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            </div>
+            <div class="panel" id="panel-2" role="tabpanel" aria-hidden="true">
+              <div class="table-header" v-if="Object.keys(components).length > 0">
+                <div class="table-header__summary">
+                  <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
+                  <span class="table-header__header">Component Type</span>
+                </div>
+              </div>
+              <details class="mdc-expansion" v-for="items in components" :key="items[0].componentType">
+                <summary class="mdc-expansion__summary">
+                  <div>
+                    <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
+                    <span class="mdc-expansion__header">{{ items[0].componentType }}</span>
+                  </div>
+                </summary>
+                <div class="mdc-expansion__content">
+                  <table ref="componentsTables" class="mdl-data-table">
+                    <tbody>
+                      <tr v-for="item in items" @click.capture="item.selected = !item.selected">
+                        <td>
+                          <mdc-checkbox v-model="item.selected" />
+                        </td>
+                        <td class="mdl-data-table__cell--non-numeric">{{ item.kitLabel }}</td>
+                        <td>{{ item.kitStatus }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
             </div>
           </div>
-          <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel">
-            <summary class="mdc-expansion__summary">
-              <div>
-                <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
-                <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
-                <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
-              </div>
-            </summary>
-            <div class="mdc-expansion__content">
-              <table ref="componentsTables" class="mdl-data-table">
-                <tbody>
-                  <tr v-for="item in items" @click.capture="item.selected = !item.selected">
-                    <td>
-                      <mdc-checkbox v-model="item.selected" />
-                    </td>
-                    <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
-                    <td>{{ item.quantity }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </details>
-        </div>
-        <div class="panel" id="panel-2" role="tabpanel" aria-hidden="true">Item Two</div>
-      </div>
-    </section>
-
-        <button id="print-selected" 
-                @click="printSelected" 
-                class="mdc-button mdc-button--accent mdc-button--raised">
+        </section>
+  
+        <button id="print-selected" @click="printSelected" class="mdc-button mdc-button--accent mdc-button--raised">
           <span>Print selected</span>
         </button>
         <snackbar event="notify"></snackbar>
-        <mdc-dialog 
-          title="Choose kit statuses to include in query"
-          ref="statuses"
-          :useDefaultFooter="false"
-          ariaDescription="my-mdc-dialog-description">
+        <mdc-dialog title="Choose kit statuses to include in query" ref="statuses" :useDefaultFooter="false" ariaDescription="my-mdc-dialog-description">
           <section id="my-mdc-dialog-description" class="mdc-dialog__body">
             <div class="two-columns">
               <div v-for="status in kitStatuses" class="mdc-form-field">
@@ -105,8 +123,7 @@
             </div>
           </section>
           <footer class="mdc-dialog__footer">
-            <button type="button" class="mdc-button mdc-dialog__footer__button"
-                    @click="() => { fetchKitComponents(); $refs.statuses.close(); }">
+            <button type="button" class="mdc-button mdc-dialog__footer__button" @click="() => { fetchKitComponents(); $refs.statuses.close(); }">
               Update
             </button>
           </footer>
