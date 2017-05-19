@@ -14,7 +14,7 @@
         <input type="text" class="mdc-textfield__input mdc-theme--text-primary-on-dark">
         <span class="mdc-textfield__label mdc-theme--text-secondary-on-dark">Search kits</span>
       </label>
-      <button slot="section-end" class="toolbar-button material-icons"  @click="$refs.statuses.show()">settings</button>
+      <button slot="section-end" class="toolbar-button material-icons" @click="$refs.statuses.show()">settings</button>
     </toolbar>
     <div class="content mdc-toolbar-fixed-adjust">
       <!-- Main content -->
@@ -92,6 +92,7 @@
         </section>
   
         <button id="print-selected" @click="printSelected" class="mdc-button mdc-button--accent mdc-button--raised">
+          <span class="v-align-middle material-icons">print</span>
           <span>Print selected</span>
         </button>
         <snackbar event="notify"></snackbar>
@@ -274,7 +275,6 @@ $mdc-theme-background: #fff;
 
 <style src="@material/typography/mdc-typography.scss" lang="scss"></style>
 <style src="@material/textfield/mdc-textfield.scss" lang="scss"></style>
-<style src="@material/drawer/persistent/mdc-persistent-drawer.scss" lang="scss"></style>
 <style src="@material/button/mdc-button.scss" lang="scss"></style>
 <style src="./assets/mdl/data-table/data-table.scss" lang="scss"></style>
 <style src="@material/list/mdc-list.scss" lang="scss"></style>
@@ -283,6 +283,9 @@ $mdc-theme-background: #fff;
 <style src="./components/mdc-expansion.scss" lang="scss"></style>
 
 <style lang="scss">
+.v-align-middle {
+  vertical-align: middle;
+}
 
 .material-icons {
   text-decoration: none;
@@ -312,7 +315,6 @@ $mdc-theme-background: #fff;
 .main {
   margin-left: auto;
   margin-right: auto;
-  padding: 24px;
 }
 
 .mdc-textfield.search-box {
