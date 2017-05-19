@@ -180,7 +180,6 @@ export default {
   methods: {
     updatePanel () {
       var vm = this;
-      console.log(vm);
       var activePanel = document.querySelector('.panel.active');
       if (activePanel) {
         activePanel.classList.remove('active');
@@ -419,17 +418,19 @@ $mdc-theme-background: #fff;
   }
 }
 
-
 .panels {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-top: 8px;
-      }
-      .panel {
-        display: none;
-      }
-      .panel.active {
-        display: block;
-      }
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+}
+
 </style>
