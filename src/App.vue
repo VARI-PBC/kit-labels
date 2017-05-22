@@ -357,7 +357,7 @@ $mdc-theme-background: #fff;
         }
       }
     width: 100%;
-    margin-left: 24px;
+    margin-left: 12px;
   }
 }
 
