@@ -9,7 +9,10 @@ export default {
   name: 'select-all',
   components: { mdcCheckbox },
   props: {
-    items: Array,
+    items: {
+      type: Array,
+      required: true
+    },
     selectedKey: String
   },
   computed: {
@@ -17,12 +20,16 @@ export default {
       get () {
         var vm = this;
         return vm.items.length > 0 &&
-          vm.items.every(item => item[vm.selectedKey] === true);
+          vm.items.every(item => vm.selectedKey ? item[vm.selectedKey] : item);
       },
       set (value) {
         var vm = this;
-        vm.items.forEach(function (item) {
-          item[vm.selectedKey] = value;
+        vm.items.forEach(function (item, index) {
+          if (vm.selectedKey) {
+            item[vm.selectedKey] = value;
+          } else {
+            vm.$set(vm.items, index, value);
+          }
         });
       }
     }
