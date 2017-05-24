@@ -145,7 +145,7 @@ async function bsiQuery (queryParams) {
   return new Promise((resolve, reject) => {
     client.methodCall('report.execute', params, function (error, result) {
       if (error) {
-        if (error['code'] === 9000) {
+        if (error['code'] >= 9000) {
           delete cachedData._sessionId;
         }
         reject(error['message']);
@@ -250,11 +250,11 @@ async function buildKitComponents (resultSet, kitType) {
     if (labelConfig) {
       var generateValues = variable =>
         fp.zipWith((val, seq) => fp.replace('%sequence%', seq || '', val),
-          fp.times(fp.constant(
-            fp.replace('%kitLabel%', kitComponent.kitLabel, variable.value)),
-            kitComponent.quantity),
-          generateLabelSequence(variable)
-        );
+            fp.times(fp.constant(
+              fp.replace('%kitLabel%', kitComponent.kitLabel, variable.value)),
+              kitComponent.quantity),
+            generateLabelSequence(variable)
+          );
       var labelFields = {
         labels: labelConfig.labels,
         headers: fp.map('name', labelConfig.labelVariables),
