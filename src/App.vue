@@ -96,18 +96,66 @@
           <span>Print selected</span>
         </button>
         <snackbar event="notify"></snackbar>
-        <mdc-dialog title="Choose kit statuses to include in query" ref="statuses" :useDefaultFooter="false" ariaDescription="my-mdc-dialog-description">
-          <section id="my-mdc-dialog-description" class="mdc-dialog__body">
+        <mdc-dialog 
+          title="Choose kit statuses to include in query"
+          ref="statuses"
+          :useDefaultFooter="false">
+          <section class="mdc-dialog__body">
             <div class="two-columns">
               <div v-for="status in kitStatuses" class="mdc-form-field">
-                <mdc-checkbox :id="'my-checkbox-'+status.id" :labelId="'my-checkbox-label-'+status.id" :value="status.id" v-model="selectedKitStatuses" />
-                <label :id="'my-checkbox-label-'+status.id" :for="'my-checkbox-'+status.id">{{ status.label }}</label>
+                <mdc-checkbox :id="'status-checkbox-'+status.id" :labelId="'status-checkbox-label-'+status.id" :value="status.id" v-model="selectedKitStatuses" />
+                <label :id="'status-checkbox-label-'+status.id" :for="'status-checkbox-'+status.id">{{ status.label }}</label>
               </div>
             </div>
           </section>
           <footer class="mdc-dialog__footer">
             <button type="button" class="mdc-button mdc-dialog__footer__button" @click="() => { fetchKitComponents(); $refs.statuses.close(); }">
               Update
+            </button>
+          </footer>
+        </mdc-dialog>
+        <mdc-dialog id="print-dialog"
+          title="Print selected labels via BarTender"
+          ref="print"
+          :useDefaultFooter="false">
+          <section class="mdc-dialog__body">
+            <template v-for="item in selectedItems">
+              <template v-for="label in item.labels">
+                <ul class="mdc-list mdc-list--two-line mdc-list--avatar-list">
+                  <li class="mdc-list-divider" role="separator"></li>
+                  <li class="mdc-list-item">
+                    <span class="mdc-list-item__start-detail">
+                      <select-all :items="label.selected" />
+                    </span>
+                    <span class="mdc-list-item__text">{{ item.componentType }}
+                      <span class="mdc-list-item__text__secondary">{{ label.description || label.templateFile }}</span>
+                    </span>
+                  </li>
+                </ul>
+                <div class="mdc-layout-grid">
+                  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1"></div>
+                  <div class="mdc-layout-grid__cell" v-for="header in item.headers">{{ header }}</div>
+                </div>
+                <div class="mdc-layout-grid" v-for="(row,i) in item.values">
+                  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1">
+                    <mdc-checkbox class="center-flex-item" v-model="label.selected[i]" />
+                  </div>
+                  <div class="mdc-layout-grid__cell mdc-textfield mdc-textfield--fullwidth" v-for="value in row">
+                    <input type="text" class="mdc-textfield__input" :value="value">
+                  </div>
+                </div>
+                <br><br>
+              </template>
+            </template>
+          </section>
+          <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button"
+                    @click="() => { $refs.print.close(); }">
+              Cancel
+            </button>
+            <button type="button" class="mdc-button mdc-dialog__footer__button"
+                    @click="">
+              Print
             </button>
           </footer>
         </mdc-dialog>
@@ -157,6 +205,9 @@ export default {
         grouped[item.componentType].push(item);
         return grouped;
       }, Object.create(null));
+    },
+    selectedItems () {
+      return this.kitComponents.filter(item => item.selected);
     }
   },
   methods: {
@@ -197,6 +248,7 @@ export default {
           response.json().then(function (kitComponents) {
             vm.kitComponents = kitComponents.map(function (item) {
               item.selected = false;
+              item.labels.forEach(label => { label.selected = item.values.map(() => true); });
               return item;
             });
           });
@@ -213,10 +265,7 @@ export default {
       });
     },
     printSelected () {
-      this.$root.$emit('notify', {
-        message: 'Selected: ' + 1,
-        timeout: 2000
-      })
+      this.$refs.print.show();
     }
   },
   created () {
@@ -281,6 +330,7 @@ $mdc-theme-background: #fff;
 <style src="@material/form-field/mdc-form-field.scss" lang="scss"></style>
 <style src="@material/tabs/mdc-tabs.scss" lang="scss"></style>
 <style src="./components/mdc-expansion.scss" lang="scss"></style>
+<style src="@material/layout-grid/mdc-layout-grid.scss" lang="scss"></style>
 
 <style lang="scss">
 .v-align-middle {
@@ -330,6 +380,26 @@ $mdc-theme-background: #fff;
   margin-right: 40px;
   margin-bottom: 40px;
   z-index: 900;
+}
+
+#print-dialog {
+
+  .mdc-dialog__surface {
+    max-height: 90vh;
+  }
+
+  .mdc-dialog__body {
+    max-height: inherit;
+    overflow: scroll;
+  }
+
+  .mdc-layout-grid {
+    --mdc-layout-grid-margin: 4px;
+  }
+
+  .mdc-textfield--fullwidth {
+    height: 40px;
+  }
 }
 
 @import "@material/elevation/mixins";
