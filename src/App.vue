@@ -179,7 +179,7 @@ export default {
   components: { Toolbar, mdcSelect, Snackbar, mdcDialog, mdcCheckbox, SelectAll, MDCTabBar, MDCTabFoundation },
   data () {
     return {
-      filterBy: '44',
+      filterBy: '',
       panels: [],
       kitTypes: [],
       selectedKitType: 'Select kit type',
