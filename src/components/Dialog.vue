@@ -12,8 +12,11 @@
         {{ title }}
       </h2>
     </header>
-    <slot class="mdc-dialog__body"></slot>
-    <footer class="mdc-dialog__footer" v-if="useDefaultFooter">
+    <section class="mdc-dialog__body">
+      <slot></slot>
+    </section>
+    <slot name="footer">
+    <footer class="mdc-dialog__footer">
       <button type="button"
               class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel"
               @click="$emit('cancel')">Cancel</button>
@@ -21,6 +24,7 @@
               class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept"
               @click="$emit('accept')">Accept</button>
     </footer>
+    </slot>
   </div>
   <div class="mdc-dialog__backdrop"></div>
 </aside>
@@ -33,10 +37,6 @@ export default {
   name: 'mdc-dialog',
   props: {
     title: String,
-    useDefaultFooter: {
-      type: Boolean,
-      default: true
-    },
     ariaDescription: {
       type: String,
       required: false
