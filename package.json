@@ -17,6 +17,7 @@
     "@material/drawer": "^0.4.0",
     "@material/fab": "^0.3.6",
     "@material/form-field": "^0.2.4",
+    "@material/layout-grid": "^0.1.2",
     "@material/list": "^0.2.7",
     "@material/menu": "^0.2.4",
     "@material/select": "^0.3.4",
