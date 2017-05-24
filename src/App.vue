@@ -11,7 +11,7 @@
         </template>
       </mdc-select>
       <label slot="section-end" ref="search" class="mdc-textfield search-box">
-        <input type="text" class="mdc-textfield__input mdc-theme--text-primary-on-dark">
+        <input type="text" class="mdc-textfield__input mdc-theme--text-primary-on-dark" v-model="filterBy">
         <span class="mdc-textfield__label mdc-theme--text-secondary-on-dark">Search kits</span>
       </label>
       <button slot="section-end" class="toolbar-button material-icons" @click="$refs.statuses.show()">settings</button>
@@ -36,7 +36,7 @@
                   <span class="table-header__secondary-content">Status</span>
                 </div>
               </div>
-              <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel">
+              <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
                 <summary class="mdc-expansion__summary">
                   <div>
                     <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -66,7 +66,7 @@
                   <span class="table-header__header">Component Type</span>
                 </div>
               </div>
-              <details class="mdc-expansion" v-for="items in components" :key="items[0].componentType">
+              <details class="mdc-expansion" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
                 <summary class="mdc-expansion__summary">
                   <div>
                     <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -179,6 +179,7 @@ export default {
   components: { Toolbar, mdcSelect, Snackbar, mdcDialog, mdcCheckbox, SelectAll, MDCTabBar, MDCTabFoundation },
   data () {
     return {
+      filterBy: '44',
       panels: [],
       kitTypes: [],
       selectedKitType: 'Select kit type',
