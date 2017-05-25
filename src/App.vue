@@ -20,7 +20,7 @@
       <!-- Main content -->
       <main class="main">
         <section id="tab-nav">
-          <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist" @MDCTabBar:change="updatePanel">
+          <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
             <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
             <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
             <span class="mdc-tab-bar__indicator"></span>
@@ -28,7 +28,7 @@
         </section>
         <section>
           <div class="panels" ref="panels">
-            <div class="panel active" id="panel-1" role="tabpanel" aria-hidden="false">
+            <div class="panel" :class="{ active: tabIsActive(1) }" id="panel-1" role="tabpanel" aria-hidden="false">
               <div class="table-header" v-if="Object.keys(kits).length > 0">
                 <div class="table-header__summary">
                   <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
@@ -59,7 +59,7 @@
                 </div>
               </details>
             </div>
-            <div class="panel" id="panel-2" role="tabpanel" aria-hidden="true">
+            <div class="panel" :class="{ active: tabIsActive(2) }" id="panel-2" role="tabpanel" aria-hidden="true">
               <div class="table-header" v-if="Object.keys(components).length > 0">
                 <div class="table-header__summary">
                   <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
@@ -81,7 +81,8 @@
                           <mdc-checkbox v-model="item.selected" />
                         </td>
                         <td class="mdl-data-table__cell--non-numeric">{{ item.kitLabel }}</td>
-                        <td>{{ item.kitStatus }}</td>
+                        <td class="mdl-data-table__cell--non-numeric">{{ item.kitStatus }}</td>
+                        <td>{{ item.quantity }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -187,7 +188,8 @@ export default {
       kitComponents: [],
       loading: false,
       dataTable: null,
-      selectedKitStatuses: [1]
+      selectedKitStatuses: [1],
+      tabBar: null
     }
   },
   computed: {
@@ -212,16 +214,8 @@ export default {
     }
   },
   methods: {
-    updatePanel () {
-      var vm = this;
-      var activePanel = document.querySelector('.panel.active');
-      if (activePanel) {
-        activePanel.classList.remove('active');
-      }
-      var newActivePanel = document.querySelector('.panel:nth-child(' + (vm.tabs.activeTabIndex + 1) + ')');
-      if (newActivePanel) {
-        newActivePanel.classList.add('active');
-      }
+    tabIsActive (panelIndex) {
+      return this.tabBar ? this.tabBar.tabs[panelIndex - 1].isActive : 1;
     },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
@@ -309,7 +303,7 @@ export default {
   mounted () {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
-    this.tabs = MDCTabBar.attachTo(this.$refs.tabs)
+    this.tabBar = MDCTabBar.attachTo(this.$refs.tabs);
   }
 }
 
