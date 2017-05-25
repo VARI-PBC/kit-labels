@@ -445,7 +445,7 @@ $mdc-theme-background: #fff;
     justify-content: center;
     font-size: 1.0625rem;
     font-weight: 700;
-    flex-basis: 30%;
+    flex-basis: 50%;
     color: rgba(0, 0, 0, .45);
     margin-right: 16px;
   }
