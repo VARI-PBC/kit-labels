@@ -6,6 +6,7 @@
   
   &__summary {
     outline: none;
+    display: block;
       
     > div {
       padding: 6px 24px;
@@ -30,6 +31,10 @@
     }
 
     &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::-moz-details-marker {
       display: none;
     }
   }

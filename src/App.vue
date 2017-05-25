@@ -16,81 +16,81 @@
       </label>
       <button slot="section-end" class="toolbar-button material-icons" @click="$refs.statuses.show()">settings</button>
     </toolbar>
-    <div class="content mdc-toolbar-fixed-adjust">
-      <!-- Main content -->
-      <main class="main">
-        <section id="tab-nav">
-          <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist" @MDCTabBar:change="updatePanel">
-            <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
-            <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
-            <span class="mdc-tab-bar__indicator"></span>
-          </nav>
-        </section>
-        <section>
-          <div class="panels" ref="panels">
-            <div class="panel active" id="panel-1" role="tabpanel" aria-hidden="false">
-              <div class="table-header" v-if="Object.keys(kits).length > 0">
-                <div class="table-header__summary">
-                  <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
-                  <span class="table-header__header">Kit label</span>
-                  <span class="table-header__secondary-content">Status</span>
-                </div>
+    <!-- Main content -->
+    <main class="main mdc-toolbar-fixed-adjust" v-show="Object.keys(kits).length > 0">
+      <section id="tab-nav">
+        <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
+          <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
+          <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
+          <span class="mdc-tab-bar__indicator"></span>
+        </nav>
+      </section>
+      <section>
+        <div class="panels" ref="panels">
+          <div class="panel" :class="{ active: tabIsActive(1) }" id="panel-1" role="tabpanel" aria-hidden="false">
+            <div class="table-header">
+              <div class="table-header__summary">
+                <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
+                <span class="table-header__header">Kit label</span>
+                <span class="table-header__secondary-content">Status</span>
               </div>
-              <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
-                <summary class="mdc-expansion__summary">
-                  <div>
-                    <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
-                    <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
-                    <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
-                  </div>
-                </summary>
-                <div class="mdc-expansion__content">
-                  <table ref="componentsTables" class="mdl-data-table">
-                    <tbody>
-                      <tr v-for="item in items" @click.capture="item.selected = !item.selected">
-                        <td>
-                          <mdc-checkbox v-model="item.selected" />
-                        </td>
-                        <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
-                        <td>{{ item.quantity }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </details>
             </div>
-            <div class="panel" id="panel-2" role="tabpanel" aria-hidden="true">
-              <div class="table-header" v-if="Object.keys(components).length > 0">
-                <div class="table-header__summary">
-                  <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
-                  <span class="table-header__header">Component Type</span>
+            <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
+              <summary class="mdc-expansion__summary">
+                <div>
+                  <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
+                  <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
+                  <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
                 </div>
+              </summary>
+              <div class="mdc-expansion__content">
+                <table ref="componentsTables" class="mdl-data-table">
+                  <tbody>
+                    <tr v-for="item in items" @click.capture="item.selected = !item.selected">
+                      <td>
+                        <mdc-checkbox v-model="item.selected" />
+                      </td>
+                      <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
+                      <td>{{ item.quantity }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <details class="mdc-expansion" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
-                <summary class="mdc-expansion__summary">
-                  <div>
-                    <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
-                    <span class="mdc-expansion__header">{{ items[0].componentType }}</span>
-                  </div>
-                </summary>
-                <div class="mdc-expansion__content">
-                  <table ref="componentsTables" class="mdl-data-table">
-                    <tbody>
-                      <tr v-for="item in items" @click.capture="item.selected = !item.selected">
-                        <td>
-                          <mdc-checkbox v-model="item.selected" />
-                        </td>
-                        <td class="mdl-data-table__cell--non-numeric">{{ item.kitLabel }}</td>
-                        <td>{{ item.kitStatus }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            </div>
+            </details>
           </div>
-        </section>
-  
+          <div class="panel" :class="{ active: tabIsActive(2) }" id="panel-2" role="tabpanel" aria-hidden="true">
+            <div class="table-header">
+              <div class="table-header__summary">
+                <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
+                <span class="table-header__header">Component Type</span>
+              </div>
+            </div>
+            <details class="mdc-expansion" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
+              <summary class="mdc-expansion__summary">
+                <div>
+                  <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
+                  <span class="mdc-expansion__header">{{ items[0].componentType }}</span>
+                </div>
+              </summary>
+              <div class="mdc-expansion__content">
+                <table ref="componentsTables" class="mdl-data-table">
+                  <tbody>
+                    <tr v-for="item in items" @click.capture="item.selected = !item.selected">
+                      <td>
+                        <mdc-checkbox v-model="item.selected" />
+                      </td>
+                      <td class="mdl-data-table__cell--non-numeric">{{ item.kitLabel }}</td>
+                      <td class="mdl-data-table__cell--non-numeric">{{ item.kitStatus }}</td>
+                      <td>{{ item.quantity }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
         <button id="print-selected" @click="printSelected" class="mdc-button mdc-button--accent mdc-button--raised">
           <span class="v-align-middle material-icons">print</span>
           <span>Print selected</span>
@@ -142,6 +142,7 @@
               <br><br>
             </template>
           </template>
+<<<<<<< HEAD
           <footer class="mdc-dialog__footer" slot="footer">
             <button type="button" class="mdc-button mdc-dialog__footer__button"
                     @click="() => { $refs.print.close(); }">
@@ -155,6 +156,21 @@
         </mdc-dialog>
       </main>
     </div>
+=======
+        </section>
+        <footer class="mdc-dialog__footer">
+          <button type="button" class="mdc-button mdc-dialog__footer__button"
+                  @click="() => { $refs.print.close(); }">
+            Cancel
+          </button>
+          <button type="button" class="mdc-button mdc-dialog__footer__button"
+                  @click="">
+            Print
+          </button>
+        </footer>
+      </mdc-dialog>
+    </main>
+>>>>>>> 6518e65670ec10ed7c49004685b66afeb6e1e1f3
   </body>
 </template>
 
@@ -173,7 +189,7 @@ export default {
   components: { Toolbar, mdcSelect, Snackbar, mdcDialog, mdcCheckbox, SelectAll, MDCTabBar, MDCTabFoundation },
   data () {
     return {
-      filterBy: '44',
+      filterBy: '',
       panels: [],
       kitTypes: [],
       selectedKitType: 'Select kit type',
@@ -181,7 +197,8 @@ export default {
       kitComponents: [],
       loading: false,
       dataTable: null,
-      selectedKitStatuses: [1]
+      selectedKitStatuses: [1],
+      tabBar: null
     }
   },
   computed: {
@@ -206,16 +223,8 @@ export default {
     }
   },
   methods: {
-    updatePanel () {
-      var vm = this;
-      var activePanel = document.querySelector('.panel.active');
-      if (activePanel) {
-        activePanel.classList.remove('active');
-      }
-      var newActivePanel = document.querySelector('.panel:nth-child(' + (vm.tabs.activeTabIndex + 1) + ')');
-      if (newActivePanel) {
-        newActivePanel.classList.add('active');
-      }
+    tabIsActive (panelIndex) {
+      return this.tabBar ? this.tabBar.tabs[panelIndex - 1].isActive : 1;
     },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
@@ -303,7 +312,7 @@ export default {
   mounted () {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
-    this.tabs = MDCTabBar.attachTo(this.$refs.tabs)
+    this.tabBar = MDCTabBar.attachTo(this.$refs.tabs);
   }
 }
 
@@ -350,16 +359,10 @@ $mdc-theme-background: #fff;
   box-sizing: border-box;
 }
 
-/* Place drawer and main next to each other. */
-.content {
-  display: flex;
-  height: 100%;
-  box-sizing: border-box;
-}
-
 .main {
   margin-left: auto;
   margin-right: auto;
+  width: intrinsic;
 }
 
 .mdc-textfield.search-box {
@@ -374,7 +377,6 @@ $mdc-theme-background: #fff;
   bottom: 0;
   margin-right: 40px;
   margin-bottom: 40px;
-  z-index: 900;
 }
 
 #print-dialog {

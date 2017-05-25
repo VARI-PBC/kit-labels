@@ -7,6 +7,7 @@
            :disabled="disabled"
            :id="id"
            v-model="model"
+           :indeterminate.prop="indeterminate"
            :aria-labelledby="labelId"
     />
     <div class="mdc-checkbox__background">
@@ -36,9 +37,10 @@ export default {
 
   props: {
     value: {
-      required: false,
+      required: false
     },
     checked: [Array, Boolean],
+    indeterminate: Boolean,
     disabled: [Boolean, String],
     id: String,
     labelId: String

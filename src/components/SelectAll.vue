@@ -1,5 +1,5 @@
 <template>
-    <mdc-checkbox v-model="selectAllItems"></mdc-checkbox>
+    <mdc-checkbox v-model="selectAllItems" :indeterminate="setIndeterminate"></mdc-checkbox>
 </template>
 
 <script>
@@ -32,6 +32,12 @@ export default {
           }
         });
       }
+    },
+    setIndeterminate () {
+      var vm = this;
+      return vm.items.length > 0 &&
+       vm.items.some(item => vm.selectedKey ? item[vm.selectedKey] : item) &&
+       !vm.items.every(item => vm.selectedKey ? item[vm.selectedKey] : item);
     }
   }
 }
