@@ -366,7 +366,6 @@ $mdc-theme-background: #fff;
   bottom: 0;
   margin-right: 40px;
   margin-bottom: 40px;
-  z-index: 900;
 }
 
 #print-dialog {
