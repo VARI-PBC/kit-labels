@@ -17,7 +17,7 @@
       <button slot="section-end" class="toolbar-button material-icons" @click="$refs.statuses.show()">settings</button>
     </toolbar>
     <!-- Main content -->
-    <main class="main mdc-toolbar-fixed-adjust">
+    <main class="main mdc-toolbar-fixed-adjust" v-show="Object.keys(kits).length > 0">
       <section id="tab-nav">
         <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
           <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
@@ -28,7 +28,7 @@
       <section>
         <div class="panels" ref="panels">
           <div class="panel" :class="{ active: tabIsActive(1) }" id="panel-1" role="tabpanel" aria-hidden="false">
-            <div class="table-header" v-if="Object.keys(kits).length > 0">
+            <div class="table-header">
               <div class="table-header__summary">
                 <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
                 <span class="table-header__header">Kit label</span>
@@ -59,7 +59,7 @@
             </details>
           </div>
           <div class="panel" :class="{ active: tabIsActive(2) }" id="panel-2" role="tabpanel" aria-hidden="true">
-            <div class="table-header" v-if="Object.keys(components).length > 0">
+            <div class="table-header">
               <div class="table-header__summary">
                 <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
                 <span class="table-header__header">Component Type</span>
