@@ -17,7 +17,7 @@
       <button slot="section-end" class="toolbar-button material-icons" @click="$refs.statuses.show()">settings</button>
     </toolbar>
     <!-- Main content -->
-    <main class="main mdc-toolbar-fixed-adjust" v-show="Object.keys(kits).length > 0">
+    <main class="main mdc-toolbar-fixed-adjust">
       <section id="tab-nav">
         <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
           <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
@@ -25,7 +25,7 @@
           <span class="mdc-tab-bar__indicator"></span>
         </nav>
       </section>
-      <section>
+      <section v-show="Object.keys(kits).length > 0">
         <div class="panels" ref="panels">
           <div class="panel" :class="{ active: tabIsActive(1) }" id="panel-1" role="tabpanel" aria-hidden="false">
             <div class="table-header">
