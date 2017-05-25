@@ -351,6 +351,7 @@ $mdc-theme-background: #fff;
 .main {
   margin-left: auto;
   margin-right: auto;
+  width: intrinsic;
 }
 
 .mdc-textfield.search-box {
