@@ -27,7 +27,7 @@
       </section>
       <section v-show="Object.keys(kits).length > 0">
         <div class="panels" ref="panels">
-          <div class="panel" :class="{ active: tabIsActive(1) }" id="panel-1" role="tabpanel" aria-hidden="false">
+          <div class="panel" :class="{ active: activeTab === 'BY KIT' }" id="panel-1" role="tabpanel" aria-hidden="false">
             <div class="table-header">
               <div class="table-header__summary">
                 <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
@@ -58,7 +58,7 @@
               </div>
             </details>
           </div>
-          <div class="panel" :class="{ active: tabIsActive(2) }" id="panel-2" role="tabpanel" aria-hidden="true">
+          <div class="panel" :class="{ active: activeTab === 'BY COMPONENT' }" id="panel-2" role="tabpanel" aria-hidden="true">
             <div class="table-header">
               <div class="table-header__summary">
                 <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
@@ -114,33 +114,31 @@
       <mdc-dialog id="print-dialog"
         title="Print selected labels via BarTender"
         ref="print">
-        <template v-for="item in selectedItems">
-          <template v-for="label in item.labels">
-            <ul class="mdc-list mdc-list--two-line mdc-list--avatar-list">
-              <li class="mdc-list-divider" role="separator"></li>
-              <li class="mdc-list-item">
-                <span class="mdc-list-item__start-detail">
-                  <select-all :items="label.selected" />
-                </span>
-                <span class="mdc-list-item__text">{{ item.componentType }}
-                  <span class="mdc-list-item__text__secondary">{{ label.description || label.templateFile }}</span>
-                </span>
-              </li>
-            </ul>
-            <div class="mdc-layout-grid">
-              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1"></div>
-              <div class="mdc-layout-grid__cell" v-for="header in item.headers">{{ header }}</div>
+        <template v-for="group in labelGroups">
+          <ul class="mdc-list mdc-list--two-line mdc-list--avatar-list">
+            <li class="mdc-list-divider" role="separator"></li>
+            <li class="mdc-list-item">
+              <span class="mdc-list-item__start-detail">
+                <select-all :items="group.labels" selectedKey="selected" />
+              </span>
+              <span class="mdc-list-item__text">{{ group.componentType }}
+                <span class="mdc-list-item__text__secondary">{{ `${group.description || group.templateFile}&ensp;(${group.printer})` }}</span>
+              </span>
+            </li>
+          </ul>
+          <div class="mdc-layout-grid">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1"></div>
+            <div class="mdc-layout-grid__cell" v-for="header in group.headers">{{ header }}</div>
+          </div>
+          <div class="mdc-layout-grid" v-for="row in group.labels">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1">
+              <mdc-checkbox class="center-flex-item" v-model="row.selected" />
             </div>
-            <div class="mdc-layout-grid" v-for="(row,i) in item.values">
-              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1">
-                <mdc-checkbox class="center-flex-item" v-model="label.selected[i]" />
-              </div>
-              <div class="mdc-layout-grid__cell mdc-textfield mdc-textfield--fullwidth" v-for="value in row">
-                <input type="text" class="mdc-textfield__input" :value="value">
-              </div>
+            <div class="mdc-layout-grid__cell mdc-textfield mdc-textfield--fullwidth" v-for="(v,i) in row.variables">
+              <input type="text" class="mdc-textfield__input" v-model="row.variables[i]">
             </div>
-            <br><br>
-          </template>
+          </div>
+          <br><br>
         </template>
         <footer class="mdc-dialog__footer" slot="footer">
           <button type="button" class="mdc-button mdc-dialog__footer__button"
@@ -201,14 +199,43 @@ export default {
         return grouped;
       }, Object.create(null));
     },
-    selectedItems () {
-      return this.kitComponents.filter(item => item.selected);
+    activeTab () {
+      return this.tabBar ? this.tabBar.activeTab.root_.innerText.toUpperCase() : 'BY KIT';
+    },
+    labelGroups () {
+      var vm = this;
+      let filteredItems = this.kitComponents.filter(item => item.selected);
+
+      // expand and sort kit-component items to kit-label_type-component groups
+      let labelGroups = filteredItems.reduce((prev, item) => {
+        let expandedItems = item.labels.map(labelType => {
+          Object.assign(labelType, {
+            componentType: item.componentType,
+            headers: item.headers,
+            kitLabel: item.kitLabel,
+          });
+          vm.$set(labelType, 'labels', item.values.map(row => ({
+            variables: row.slice(),
+            selected: true
+          })));
+          return labelType;
+        });
+
+        return [...prev, ...expandedItems];
+      }, []);
+
+      let sortedGroups = labelGroups.sort((a, b) => {
+        var sortOrder = a.kitLabel.localeCompare(b.kitLabel);
+        if (sortOrder !== 0) return sortOrder;
+        sortOrder = a.templateFile.localeCompare(b.templateFile);
+        if (sortOrder !== 0) return sortOrder;
+        return a.componentType.localeCompare(b.componentType);
+      });
+
+      return sortedGroups;
     }
   },
   methods: {
-    tabIsActive (panelIndex) {
-      return this.tabBar ? this.tabBar.tabs[panelIndex - 1].isActive : 1;
-    },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
       var vm = this;
@@ -232,12 +259,8 @@ export default {
       .then(function (response) {
         vm.loading = false;
         if (response.ok) {
-          response.json().then(function (kitComponents) {
-            vm.kitComponents = kitComponents.map(function (item) {
-              item.selected = false;
-              item.labels.forEach(label => { label.selected = item.values.map(() => true); });
-              return item;
-            });
+          response.json().then(kitComponents => {
+            vm.kitComponents = kitComponents.map(item => Object.assign(item, { selected: false }));
           });
         } else {
           vm.$root.$emit('notify', {
