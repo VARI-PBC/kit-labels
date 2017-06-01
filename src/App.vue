@@ -33,6 +33,8 @@
                 <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
                 <span class="table-header__header">Kit label</span>
                 <span class="table-header__secondary-content">Status</span>
+                <span class="table-header__interactive-content">
+                  <button class="table-header__button material-icons" @click="toggleDetails()">swap_vert</button></span>
               </div>
             </div>
             <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
@@ -63,6 +65,10 @@
               <div class="table-header__summary">
                 <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
                 <span class="table-header__header">Component Type</span>
+                <span class="table-header__secondary-content"></span>
+                <span class="table-header__interactive-content">
+                  <button class="table-header__button material-icons" @click="toggleDetails()">swap_vert</button>
+                </span>
               </div>
             </div>
             <details class="mdc-expansion" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
@@ -236,6 +242,14 @@ export default {
     }
   },
   methods: {
+    toggleDetails () {
+      var details = document.getElementsByTagName('details');
+      var status = !details[0].open;
+      var i;
+      for (i = 0; i < details.length; i++) {
+        details[i].open = status;
+      }
+    },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
       var vm = this;
@@ -468,7 +482,7 @@ $mdc-theme-background: #fff;
     justify-content: center;
     font-size: 1.0625rem;
     font-weight: 700;
-    flex-basis: 50%;
+    flex-basis: 53%;
     color: rgba(0, 0, 0, .45);
     margin-right: 16px;
   }
@@ -484,9 +498,31 @@ $mdc-theme-background: #fff;
     justify-content: center;
     font-size: 1.0625rem;
     font-weight: 700;
-    flex-basis: 30%;
+    flex-basis: 35%;
     color: rgba(0, 0, 0, .45);
     margin-right: 16px;
+  }
+
+  &__interactive-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    flex-basis: 0%;
+    color: rgba(0, 0, 0, .45);
+  }
+
+  &__button {
+    justify-content: right;
+    background: none;
+    border: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    color: rgba(0, 0, 0, .45);
+    box-sizing: border-box;
   }
 }
 
