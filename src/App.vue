@@ -37,7 +37,7 @@
                   <button class="table-header__button material-icons" @click="toggleDetails()">swap_vert</button></span>
               </div>
             </div>
-            <details class="mdc-expansion" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
+            <details class="mdc-expansion" ref="expansion" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
               <summary class="mdc-expansion__summary">
                 <div>
                   <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -67,7 +67,7 @@
                 <span class="table-header__header">Component Type</span>
                 <span class="table-header__secondary-content"></span>
                 <span class="table-header__interactive-content">
-                  <button class="table-header__button material-icons" @click="toggleDetails()">swap_vert</button>
+                  <button class="table-header__button material-icons" @click="toggleDetails">swap_vert</button>
                 </span>
               </div>
             </div>
@@ -128,7 +128,7 @@
                 <select-all :items="group.labels" selectedKey="selected" />
               </span>
               <span class="mdc-list-item__text">{{ group.componentType }}
-                <span class="mdc-list-item__text__secondary">{{ `${group.description || group.templateFile}&ensp;(${group.printer})` }}</span>
+                <span class="mdc-list-item__text__secondary">{{ (group.description || group.templateFile) + '&ensp;(' + group.printer + ')' }}</span>
               </span>
             </li>
           </ul>
@@ -243,12 +243,8 @@ export default {
   },
   methods: {
     toggleDetails () {
-      var details = document.getElementsByTagName('details');
-      var status = !details[0].open;
-      var i;
-      for (i = 0; i < details.length; i++) {
-        details[i].open = status;
-      }
+      let status = !this.$refs.expansion[0].open;
+      this.$refs.expansion.forEach(e => { e.open = status; });
     },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
