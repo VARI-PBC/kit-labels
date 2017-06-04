@@ -147,11 +147,11 @@
           <br><br>
         </template>
         <footer class="mdc-dialog__footer" slot="footer">
-          <button type="button" class="mdc-button mdc-dialog__footer__button"
+          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel"
                   @click="() => { $refs.print.close(); }">
             Cancel
           </button>
-          <button type="button" class="mdc-button mdc-dialog__footer__button"
+          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept"
                   @click="">
             Print
           </button>

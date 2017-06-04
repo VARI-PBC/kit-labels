@@ -1,7 +1,6 @@
 <template>
 <aside id="my-mdc-dialog"
   ref="root"
-  style="visibility:hidden"
   class="mdc-dialog"
   role="alertdialog"
   aria-labelledby="my-mdc-dialog-label"
