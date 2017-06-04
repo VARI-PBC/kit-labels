@@ -34,10 +34,10 @@
                 <span class="table-header__header">Kit label</span>
                 <span class="table-header__secondary-content">Status</span>
                 <span class="table-header__interactive-content">
-                  <button class="table-header__button material-icons" @click="toggleDetails()">swap_vert</button></span>
+                  <button class="table-header__button material-icons" @click="toggleDetails">swap_vert</button></span>
               </div>
             </div>
-            <details class="mdc-expansion" ref="expansion" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
+            <details class="mdc-expansion" ref="kit_expansions" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
               <summary class="mdc-expansion__summary">
                 <div>
                   <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -71,7 +71,7 @@
                 </span>
               </div>
             </div>
-            <details class="mdc-expansion" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
+            <details class="mdc-expansion" ref="component_expansions" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
               <summary class="mdc-expansion__summary">
                 <div>
                   <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -243,8 +243,10 @@ export default {
   },
   methods: {
     toggleDetails () {
-      let status = !this.$refs.expansion[0].open;
-      this.$refs.expansion.forEach(e => { e.open = status; });
+      let expansions = this.activeTab === 'BY KIT' ? this.$refs.kit_expansions
+        : this.$refs.component_expansions;
+      let status = !expansions[0].open;
+      expansions.forEach(e => { e.open = status; });
     },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
