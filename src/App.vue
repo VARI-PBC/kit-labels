@@ -97,7 +97,7 @@
         </div>
       </section>
 
-      <button id="print-selected" @click="printSelected" class="mdc-button mdc-button--accent mdc-button--raised">
+      <button id="print-selected" @click="openPrintSelectedDialog" class="mdc-button mdc-button--accent mdc-button--raised">
         <span class="v-align-middle material-icons">print</span>
         <span>Print selected</span>
       </button>
@@ -152,7 +152,7 @@
             Cancel
           </button>
           <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept"
-                  @click="">
+                  @click="submitLabelsToBarTender">
             Print
           </button>
         </footer>
@@ -286,8 +286,26 @@ export default {
         }
       });
     },
-    printSelected () {
+    openPrintSelectedDialog () {
       this.$refs.print.show();
+    },
+    submitLabelsToBarTender () {
+      let vm = this;
+      let labelMap = new Map();
+      this.labelGroups.forEach(group => {
+        let key = { templateFile: group.templateFile, printer: group.printer };
+        let value = [...(labelMap.get(key) || [group.headers]), ...group.labels.map(l => l.variables)];
+        labelMap.set(key, value);
+      });
+      let data = JSON.stringify(Array.from(labelMap));
+      fetch('api/printLabels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: data })
+      .then(function (response) {
+        response.text().then(function (text) {
+          vm.$root.$emit('notify', {
+            message: text
+          });
+        });
+      });
     }
   },
   created () {

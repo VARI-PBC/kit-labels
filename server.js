@@ -1,16 +1,19 @@
 //@ts-check
 /* global __dirname */
 'use strict';
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 const config = require('./backendConfig');
-var fp = require('lodash/fp');
+const fp = require('lodash/fp');
 //const https = require('https');
 //const querystring = require('querystring');
+const bodyParser = require('body-parser');
+const dateformat = require('dateformat');
 
 // Create an express app
 var express = require('express');
 var app = express();
+app.use(bodyParser.json())
 
 // Serve files from the dist directory
 app.use('/', express.static(path.resolve(__dirname, 'dist')));
@@ -85,7 +88,7 @@ async function logon () {
 */
 async function logon () {
   return new Promise((resolve, reject) => {
-    var logonArgs = [config.bsi.logonArgs.user_name, config.bsi.logonArgs.password, config.bsi.database];
+    let logonArgs = [config.bsi.logonArgs.username, config.bsi.logonArgs.password, config.bsi.database];
     client.methodCall('common.logon', logonArgs, function (error, d) {
       if (error) {
         console.error(error);
@@ -306,6 +309,16 @@ app.get('/api/kits', async function (request, response) {
   }
 });
 
+app.post('/api/printLabels', async function (request, response) {
+  request.body.forEach(job => {
+    let commands = `%BTW% /AF="${path.join(config.labels.templatePath, job[0].templateFile)}" /P /PRN="${job[0].printer}" /D=<Trigger File Name> /R=3 /X
+%END%
+`;
+    var data = job[1].map(row => row.join('\t')).join('\n');
+    fs.writeFileSync(config.bsi.logonArgs.username + '-' + dateformat(new Date(), 'yyyymmdd-HHMMss') + '.dat', commands + data);
+  })
+  response.status(200).send('Print job submitted.');
+})
 
 /// listener ///
 

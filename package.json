@@ -27,6 +27,8 @@
     "@material/theme": "^0.1.5",
     "@material/toolbar": "^0.3.3",
     "@material/typography": "^0.2.1",
+    "body-parser": "^1.17.2",
+    "dateformat": "^2.0.0",
     "vue": "~2.3.2",
     "xmlrpc": "~1.3.2"
   },
