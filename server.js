@@ -36,6 +36,11 @@ var cachedData = {
     this.kitTypes = getKitTypes();
     return this.kitTypes;
   },
+  get componentTypes () {
+    delete this.componentTypes;
+    this.componentTypes = getComponentTypes();
+    return this.componentTypes;
+  },
   get kitStatusLabels () {
     delete this.statusLabels;
     this.statusLabels = getKitStatusLabels();
@@ -173,6 +178,20 @@ async function getKitTypes () {
   return result.map(row => { return { name: row[0], value: row[1] }; });
 }
 
+async function getComponentTypes () {
+  const queryParams = {
+    display_fields: [ 'lkup_supply_type.name', 'lkup_supply_type.supply_type_id' ],
+    //criteria: [ 'lkup_supply_type.name!=@@Missing' ],
+    criteria: [{ value: '@@Missing', operator: 'not equals', field: 'lkup_supply_type.name' }],
+    sort_fields: [ 'lkup_supply_type.name' ],
+    limit: 0,
+    report_type: ReportType.LIST
+  };
+
+  var result = await bsiQuery(queryParams);
+  return result.map(row => { return { name: row[0], value: row[1] }; });
+}
+
 async function getKitStatusLabels () {
   const queryParams = {
     display_fields: [ 'lkup_kit_status.label', 'lkup_kit_status.status_id' ],
@@ -189,30 +208,42 @@ async function getKitStatusLabels () {
 
 // Read in label configs
 function getKitConfigs () {
-  return new Promise((resolve, reject) => {
-    var labelConfigs = path.resolve(__dirname, 'label_configs');
-    var fileNames = fs.readdirSync(labelConfigs);
-    var configFiles = fp.flow(
+  return new Promise(async (resolve, reject) => {
+    let labelConfigs = path.resolve(__dirname, 'label_configs');
+    let fileNames = fs.readdirSync(labelConfigs);
+    let configFiles = fp.flow(
       fp.filter(file => file.endsWith('.json')),
       fp.map(file => JSON.parse(fs.readFileSync(
         path.resolve(labelConfigs, file), 'utf8'))
       ))(fileNames);
-    var mergedConfigs = Array.prototype.concat.apply([], configFiles);
-    var kitConfigs = fp.flow(
+    let combinedConfigs = Array.prototype.concat(...configFiles);
+
+    let expandWildcards = (prop, fullNames) =>
       fp.map(cfg =>
-        fp.map(kt => fp.flow( // expand kit types
-          fp.set('kitType', kt),
-          fp.omit('kitTypes'))(cfg)
-        )(cfg.kitTypes)),
-      fp.flatten,
+        fp.set(prop, cfg[prop].reduce((acc, pattern) => {
+          let substitutedNames = fullNames.filter(fn =>
+            new RegExp(`^${pattern.replace(/\*/g, '.*').replace(/_/g, '.')}$`).test(fn));
+          return [...acc, ...substitutedNames];
+        }, []))(cfg));
+
+    let normalizeProperty = (oldPropName, newPropName) =>
       fp.map(cfg =>
-        fp.map(ct => fp.flow( // expand component types
-          fp.set('componentType', ct),
-          fp.omit('componentTypes'))(cfg)
-        )(cfg.componentTypes)),
+        cfg[oldPropName].map(ct => fp.flow(
+          fp.set(newPropName, ct),
+          fp.omit(oldPropName))(cfg)));
+
+    let kitTypeNames = (await cachedData.kitTypes).map(kt => kt.name);
+    let componentTypeNames = (await cachedData.componentTypes).map(ct => ct.name);
+
+    let normalizeConfigs = fp.flow(
+      expandWildcards('kitTypes', kitTypeNames),
+      normalizeProperty('kitTypes', 'kitType'),
       fp.flatten,
-      fp.groupBy('kitType'))(mergedConfigs);
-    resolve(kitConfigs);
+      expandWildcards('componentTypes', componentTypeNames),
+      normalizeProperty('componentTypes', 'componentType'),
+      fp.flatten,
+      fp.groupBy('kitType'));
+    resolve(normalizeConfigs(combinedConfigs));
   });
 }
 

@@ -1,7 +1,7 @@
 [
   {
-    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
-    "componentTypes": ["CPT LBR-CryoELITE Vial","CPT NCI-CryoELITE Vial","CPT LBR-OCT Mold 15x15x5","CPT NCI-OCT Mold 15x15x5"],
+    "kitTypes": ["___-CPTAC FFPE Tissue Kit","___-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT ___-CryoELITE Vial","CPT ___-OCT Mold 15x15x5"],
     "labels": [
       {
         "description": "cryovial",
@@ -28,8 +28,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","LBR-CPTAC FFPE Tissue Kit"],
-    "componentTypes": ["CPT NCI-FFPE Cassettes","CPT LBR-FFPE Cassettes"],
+    "kitTypes": ["___-CPTAC FFPE Tissue Kit"],
+    "componentTypes": ["CPT ___-FFPE Cassettes"],
     "labels": [
       {
         "templateFile": "CPTAC cassette.btw",
@@ -49,8 +49,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
-    "componentTypes": ["CPT NCI-Glass Slides","CPT LBR-Glass Slides"],
+    "kitTypes": ["___-CPTAC FFPE Tissue Kit","___-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT ___-Glass Slides"],
     "labels": [
       {
         "templateFile": "CPTAC Glass Slide Label.btw",
@@ -66,8 +66,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
-    "componentTypes": ["CPT NCI-EDTA 6ml Tube","CPT LBR-EDTA 6ml Tube"],
+    "kitTypes": ["___-CPTAC FFPE Tissue Kit","___-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT ___-EDTA 6ml Tube"],
     "labels": [
       {
         "templateFile": "CPTAC Cryovial.btw",
@@ -91,8 +91,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC FFPE Tissue Kit","NCI-CPTAC OCT Tissue Kit","LBR-CPTAC FFPE Tissue Kit","LBR-CPTAC OCT Tissue Kit"],
-    "componentTypes": ["CPT NCI-Cryovials 2mL","CPT LBR-Cryovials 2mL"],
+    "kitTypes": ["___-CPTAC FFPE Tissue Kit","___-CPTAC OCT Tissue Kit"],
+    "componentTypes": ["CPT ___-Cryovials 2mL"],
     "labels": [
       {
         "templateFile": "CPTAC Cryovial.btw",
@@ -116,8 +116,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
-    "componentTypes": ["CPT NCI-Glass Slides","CPT LBR-Glass Slides"],
+    "kitTypes": ["___-CPTAC AML Kit"],
+    "componentTypes": ["CPT ___-Glass Slides"],
     "labels": [
       {
         "templateFile": "CPTAC Glass Slide Label.btw",
@@ -133,8 +133,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
-    "componentTypes": ["CPT NCI-ACD 6ml Tube","CPT LBR-ACD 6ml Tube"],
+    "kitTypes": ["___-CPTAC AML Kit"],
+    "componentTypes": ["CPT ___-ACD 6ml Tube"],
     "labels": [
       {
         "templateFile": "CPTAC Cryovial.btw",
@@ -158,8 +158,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
-    "componentTypes": ["CPT NCI-SepMate","CPT LBR-SepMate"],
+    "kitTypes": ["___-CPTAC AML Kit"],
+    "componentTypes": ["CPT ___-SepMate"],
     "labels": [
       {
         "templateFile": "CPTAC Cryovial.btw",
@@ -174,8 +174,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
-    "componentTypes": ["CPT NCI-Cryovials 2mL","CPT LBR-Cryovials 2mL"],
+    "kitTypes": ["___-CPTAC AML Kit"],
+    "componentTypes": ["CPT ___-Cryovials 2mL"],
     "labels": [
       {
         "templateFile": "CPTAC Cryovial.btw",
@@ -199,8 +199,8 @@
     ]
   },
   {
-    "kitTypes": ["NCI-CPTAC AML Kit","LBR-CPTAC AML Kit"],
-    "componentTypes": ["CPT NCI-Microcentrifuge Tube 1.5ml","CPT LBR-Microcentrifuge Tube 1.5ml"],
+    "kitTypes": ["___-CPTAC AML Kit"],
+    "componentTypes": ["CPT ___-Microcentrifuge Tube 1.5ml"],
     "labels": [
       {
         "templateFile": "CPTAC Cryovial.btw",
