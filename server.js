@@ -211,31 +211,33 @@ function getKitConfigs () {
   return new Promise(async (resolve, reject) => {
     let labelConfigs = path.resolve(__dirname, 'label_configs');
     let fileNames = fs.readdirSync(labelConfigs);
-    let configFiles = fp.flow(
-      fp.filter(file => file.endsWith('.json')),
-      fp.map(file => JSON.parse(fs.readFileSync(
+    let configFiles = fileNames
+      .filter(file => file.endsWith('.json'))
+      .map(file => JSON.parse(fs.readFileSync(
         path.resolve(labelConfigs, file), 'utf8'))
-      ))(fileNames);
+      );
     let combinedConfigs = Array.prototype.concat(...configFiles);
 
-    let expandWildcards = (prop, fullNames) =>
-      fp.map(cfg =>
-        fp.set(prop, cfg[prop].reduce((acc, pattern) => {
+    const expandWildcards = (prop, fullNames) => cfgs =>
+      cfgs.map(cfg => {
+        cfg[prop] = cfg[prop].reduce((acc, pattern) => {
           let substitutedNames = fullNames.filter(fn =>
             new RegExp(`^${pattern.replace(/\*/g, '.*').replace(/_/g, '.')}$`).test(fn));
           return [...acc, ...substitutedNames];
-        }, []))(cfg));
+        }, []);
+        return cfg;
+      });
 
-    let normalizeProperty = (oldPropName, newPropName) =>
-      fp.map(cfg =>
-        cfg[oldPropName].map(ct => fp.flow(
-          fp.set(newPropName, ct),
-          fp.omit(oldPropName))(cfg)));
+    const normalizeProperty = (oldPropName, newPropName) => cfgs =>
+      cfgs.map(cfg =>
+        cfg[oldPropName].map(value =>
+          fp.omit(oldPropName,
+            fp.set(newPropName, value, cfg))));
 
     let kitTypeNames = (await cachedData.kitTypes).map(kt => kt.name);
     let componentTypeNames = (await cachedData.componentTypes).map(ct => ct.name);
 
-    let normalizeConfigs = fp.flow(
+    const normalizeConfigs = fp.flow(
       expandWildcards('kitTypes', kitTypeNames),
       normalizeProperty('kitTypes', 'kitType'),
       fp.flatten,
@@ -251,27 +253,25 @@ function generateLabelSequence (v) {
   if (!v.sequenceSpec) {
     return null;
   } else {
-    var sequence = fp.flow(
-      fp.split(','),
-      fp.map(range => {
-        if (!fp.includes('-', range)) {
+    var sequence = v.sequenceSpec
+      .split(',')
+      .reduce((prev, range) => {
+        if (!range.includes('-')) {
           return Number(range);
         }
-        let seq = fp.range.apply(null, fp.split('-', range));
+        let seq = fp.range(...range.split('-'));
         let last = fp.last(seq);
-        return fp.concat(seq, last + 1);
-      }),
-      fp.flattenDeep
-    )(v.sequenceSpec);
+        return [...prev, ...seq, last + 1];
+      }, []);
     if (v.padding) {
-      return fp.map(seq => (v.padding + seq).slice(-v.padding.length), sequence);
+      return sequence.map(seq => (v.padding + seq).slice(-v.padding.length));
     }
     return sequence;
   }
 }
 
 async function buildKitComponents (resultSet, kitType) {
-  let kitTypeName = fp.find(kt => kt.value === kitType)(await cachedData.kitTypes).name;
+  let kitTypeName = (await cachedData.kitTypes).find(kt => kt.value === kitType).name;
   var kitConfig = (await cachedData.kitConfigs)[kitTypeName];
   var kits = resultSet.map(function (row) {
     let kitComponent = {
@@ -280,22 +280,18 @@ async function buildKitComponents (resultSet, kitType) {
       componentType: row[2],
       quantity: Number(row[3])
     };
-    let labelConfig = fp.find(cfg => cfg.componentType === kitComponent.componentType)(kitConfig);
+    let labelConfig = kitConfig.find(cfg => cfg.componentType === kitComponent.componentType);
+    const generateValues = variable =>
+      fp.zipWith((val, seq) => val.replace('%sequence%', seq || ''),
+          Array(kitComponent.quantity).fill(variable.value.replace('%kitLabel%', kitComponent.kitLabel)),
+          generateLabelSequence(variable));
     if (labelConfig) {
-      var generateValues = variable =>
-        fp.zipWith((val, seq) => fp.replace('%sequence%', seq || '', val),
-            fp.times(fp.constant(
-              fp.replace('%kitLabel%', kitComponent.kitLabel, variable.value)),
-              kitComponent.quantity),
-            generateLabelSequence(variable)
-          );
       var labelFields = {
         labels: labelConfig.labels,
-        headers: fp.map('name', labelConfig.labelVariables),
-        values: fp.zipAll(fp.map(generateValues, labelConfig.labelVariables)),
-        //sequences: fp.map(generateLabelSequence, labelConfig.labelVariables)
+        headers: labelConfig.labelVariables.map(variable => variable.name),
+        values: fp.zipAll(labelConfig.labelVariables.map(generateValues))
       };
-      return fp.assign(kitComponent, labelFields);
+      return Object.assign(kitComponent, labelFields);
     }
     return kitComponent;
   });
