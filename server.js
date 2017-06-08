@@ -28,7 +28,7 @@ app.get('/api/kitTypes', async function (request, response) {
 
 app.get('/api/kitStatuses', async function (request, response) {
   try {
-    response.json(await utils.cachedData.kitStatusLabels);
+    response.json(await utils.kitStatusLabels);
   } catch (error) {
     response.status(500).json(error);
   }

@@ -70,13 +70,14 @@ var ds = {
 
   /* wrap BSI reporting interface
   query: async function (queryParams) {
+    let self = this;
     const options = {
       hostname: config.bsi.hostname,
       path: `/api/rest/${config.bsi.database}/reports/list?`,
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'BSI-SESSION-ID': await cachedData.sessionId
+        'BSI-SESSION-ID': await self.sessionId
       }
     };
     options.path += querystring.stringify(queryParams);
@@ -93,7 +94,7 @@ var ds = {
             var error = JSON.parse(data.toString());
             console.error(error);
             if (error['code'] === '9000') {
-              delete cachedData._sessionId;
+              delete self._sessionId;
             }
             reject(error['message']);
           } else {
@@ -112,12 +113,13 @@ var ds = {
   },
   */
   query: async function (queryParams) {
+    let self = this;
     var params = [await this.sessionId, queryParams.criteria, queryParams.display_fields, queryParams.sort_fields, queryParams.limit, queryParams.report_type];
     return new Promise((resolve, reject) => {
       client.methodCall('report.execute', params, function (error, result) {
         if (error) {
           if (error['code'] >= 9000) {
-            delete this._sessionId;
+            delete self._sessionId;
           }
           reject(error['message']);
         } else {
