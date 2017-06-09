@@ -119,7 +119,8 @@
       </mdc-dialog>
       <mdc-dialog id="print-dialog"
         title="Print selected labels via BarTender"
-        ref="print">
+        ref="print"
+        @cancel="labelGroups = []">
         <template v-for="group in labelGroups">
           <ul class="mdc-list mdc-list--two-line mdc-list--avatar-list">
             <li class="mdc-list-divider" role="separator"></li>
@@ -148,7 +149,7 @@
         </template>
         <footer class="mdc-dialog__footer" slot="footer">
           <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel"
-                  @click="() => { $refs.print.close(); }">
+                  @click="$refs.print.close()">
             Cancel
           </button>
           <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept"
@@ -185,7 +186,8 @@ export default {
       loading: false,
       dataTable: null,
       selectedKitStatuses: [1],
-      tabBar: null
+      tabBar: null,
+      labelGroups: []
     }
   },
   computed: {
@@ -207,8 +209,10 @@ export default {
     },
     activeTab () {
       return this.tabBar ? this.tabBar.activeTab.root_.innerText.toUpperCase() : 'BY KIT';
-    },
-    labelGroups () {
+    }
+  },
+  methods: {
+    generateLabelGroups () {
       var vm = this;
       let filteredItems = this.kitComponents.filter(item => item.selected);
 
@@ -239,9 +243,7 @@ export default {
       });
 
       return sortedGroups;
-    }
-  },
-  methods: {
+    },
     toggleDetails () {
       let expansions = this.activeTab === 'BY KIT' ? this.$refs.kit_expansions
         : this.$refs.component_expansions;
@@ -287,6 +289,7 @@ export default {
       });
     },
     openPrintSelectedDialog () {
+      this.labelGroups = this.generateLabelGroups();
       this.$refs.print.show();
     },
     submitLabelsToBarTender () {
@@ -304,6 +307,7 @@ export default {
           vm.$root.$emit('notify', {
             message: text
           });
+          vm.labelGroups = [];
         });
       });
     }

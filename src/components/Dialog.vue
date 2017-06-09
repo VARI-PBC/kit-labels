@@ -4,7 +4,8 @@
   class="mdc-dialog"
   role="alertdialog"
   aria-labelledby="my-mdc-dialog-label"
-  :aria-describedby="ariaDescription">
+  :aria-describedby="ariaDescription"
+  @MDCDialog:cancel="$emit('cancel')">
   <div class="mdc-dialog__surface">
     <header class="mdc-dialog__header">
       <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
