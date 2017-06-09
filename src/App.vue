@@ -14,14 +14,14 @@
         <input type="text" class="mdc-textfield__input mdc-theme--text-primary-on-dark" v-model="filterBy">
         <span class="mdc-textfield__label mdc-theme--text-secondary-on-dark">Search kits</span>
       </label>
-      <button slot="section-end" class="toolbar-button material-icons" @click="$refs.statuses.show()">settings</button>
+      <button slot="section-end" class="toolbar-button material-icons" @click="$refs.options.show()">settings</button>
     </toolbar>
     <!-- Main content -->
     <main class="main mdc-toolbar-fixed-adjust">
       <section id="tab-nav">
         <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
-          <a role="tab" aria-controls="panel-1" class="mdc-tab mdc-tab--active" href="#panel-1">By Kit</a>
-          <a role="tab" aria-controls="panel-2" class="mdc-tab" href="#panel-2">By Component</a>
+          <a role="tab" aria-controls="By kit" class="mdc-tab" :class="{ 'mdc-tab--active': activeTab === 'BY KIT' }" href="#panel-1">By Kit</a>
+          <a role="tab" aria-controls="By component" class="mdc-tab" :class="{ 'mdc-tab--active': activeTab === 'BY COMPONENT' }" href="#panel-2">By Component</a>
           <span class="mdc-tab-bar__indicator"></span>
         </nav>
       </section>
@@ -96,23 +96,42 @@
           </div>
         </div>
       </section>
-
       <button id="print-selected" @click="openPrintSelectedDialog" class="mdc-button mdc-button--accent mdc-button--raised">
         <span class="v-align-middle material-icons">print</span>
         <span>Print selected</span>
       </button>
       <snackbar event="notify"></snackbar>
-      <mdc-dialog 
-        title="Choose kit statuses to include in query"
-        ref="statuses">
-        <div class="two-columns">
-          <div v-for="status in kitStatuses" class="mdc-form-field">
-            <mdc-checkbox :id="'status-checkbox-'+status.id" :labelId="'status-checkbox-label-'+status.id" :value="status.id" v-model="selectedKitStatuses" />
-            <label :id="'status-checkbox-label-'+status.id" :for="'status-checkbox-'+status.id">{{ status.label }}</label>
+      <mdc-dialog ref="options">
+        <section id="tab-nav">
+          <nav ref="optionstabs" id="options-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
+            <a role="tab" aria-controls="Statuses" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'STATUSES' }" href="#options-panel-1">Statuses</a>
+            <a role="tab" aria-controls="Default View" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'DEFAULT TAB' }" href="#options-panel-2">Default View</a>
+            <span class="mdc-tab-bar__indicator"></span>
+          </nav>
+        </section>
+        <section>
+          <div class="panels" ref="optionspanels">
+            <div class="panel" :class="{ active: activeOptionsTab === 'STATUSES' }" id="options-panel-1" role="tabpanel" aria-hidden="false">
+              <div class="two-columns">
+                <div v-for="status in kitStatuses" class="mdc-form-field">
+                  <mdc-checkbox :id="'status-checkbox-'+status.id" :labelId="'status-checkbox-label-'+status.id" :value="status.id" v-model="selectedKitStatuses" />
+                  <label :id="'status-checkbox-label-'+status.id" :for="'status-checkbox-'+status.id">{{ status.label }}</label>
+                </div>
+              </div>
+            </div>
+            <div class="panel" :class="{ active: activeOptionsTab === 'DEFAULT VIEW' }" id="options-panel-2" role="tabpanel" aria-hidden="false">
+              <mdc-select class="mdc-theme--text-primary" v-model="selectedDefaultTab" @selected="updateDefaultTab" :options="tabs">
+                <template scope="item">
+                  <li class="mdc-list-item" role="option" :id="item.optionValue" tabindex="0">
+                    {{item.optionName}}
+                  </li>
+                </template>
+              </mdc-select>
+            </div>
           </div>
-        </div>
+        </section>
         <footer class="mdc-dialog__footer" slot="footer">
-          <button type="button" class="mdc-button mdc-dialog__footer__button" @click="() => { fetchKitComponents(); $refs.statuses.close(); }">
+          <button type="button" class="mdc-button mdc-dialog__footer__button" @click="() => { fetchKitComponents(); $refs.options.close(); }">
             Update
           </button>
         </footer>
@@ -180,11 +199,15 @@ export default {
       panels: [],
       kitTypes: [],
       selectedKitType: 'Select kit type',
+      selectedDefaultTab: this.defaultTab ? this.defaultTab : 'Select default tab',
+      tabs: [{name: 'By kit', value: 'BY KIT'}, {name: 'By component', value: 'BY COMPONENT'}],
+      defaultTab: localStorage.getItem('DefaultTab'),
       kitStatuses: [],
       kitComponents: [],
       loading: false,
       dataTable: null,
-      selectedKitStatuses: [1],
+      selectedKitStatuses: localStorage.getItem('SelectedStatuses') ? JSON.parse(localStorage.getItem('SelectedStatuses')) : [1],
+      optionsTabBar: null,
       tabBar: null
     }
   },
@@ -206,7 +229,10 @@ export default {
       }, Object.create(null));
     },
     activeTab () {
-      return this.tabBar ? this.tabBar.activeTab.root_.innerText.toUpperCase() : 'BY KIT';
+      return this.tabBar && this.tabBar.activeTab ? this.tabBar.activeTab.root_.getAttribute('aria-controls').toUpperCase() : this.defaultTab != null ? this.defaultTab : 'BY KIT';
+    },
+    activeOptionsTab () {
+      return this.optionsTabBar && this.optionsTabBar.activeTab ? this.optionsTabBar.activeTab.root_.getAttribute('aria-controls').toUpperCase() : 'STATUSES';
     },
     labelGroups () {
       var vm = this;
@@ -247,6 +273,9 @@ export default {
         : this.$refs.component_expansions;
       let status = !expansions[0].open;
       expansions.forEach(e => { e.open = status; });
+    },
+    updateDefaultTab (selectedTab) {
+      localStorage.setItem('DefaultTab', selectedTab)
     },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
@@ -308,6 +337,11 @@ export default {
       });
     }
   },
+  watch: {
+    selectedKitStatuses: function (value) {
+      localStorage.setItem('SelectedStatuses', JSON.stringify(value));
+    }
+  },
   created () {
     var vm = this;
     fetch('api/kitTypes')
@@ -349,6 +383,7 @@ export default {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
     this.tabBar = MDCTabBar.attachTo(this.$refs.tabs);
+    this.optionsTabBar = MDCTabBar.attachTo(this.$refs.optionstabs);
   }
 }
 
