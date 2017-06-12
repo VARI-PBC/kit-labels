@@ -66,8 +66,8 @@ app.post('/api/printLabels', async function (request, response) {
 
 /// listener ///
 
-app.set('port', 5000);
-app.listen(5000, function (error) {
+app.set('port', config.server.port);
+app.listen(config.server.port, function (error) {
   if (error) throw error;
-  console.log('app is running at localhost:5000');
+  console.log('app is running at localhost:' + config.server.port);
 })

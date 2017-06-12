@@ -1,5 +1,6 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
+var config = require('../backendConfig');
 
 module.exports = {
   build: {
@@ -30,7 +31,7 @@ module.exports = {
     proxyTable: {
       // proxy all requests starting with /api to jsonplaceholder
       '/api': {
-        target: 'http://localhost:5000'
+        target: 'http://localhost:' + config.server.port
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
