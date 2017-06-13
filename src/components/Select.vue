@@ -4,15 +4,11 @@
   tabindex="0"
   :class="classes"
   @MDCSelect:change="onChange">
-  <span class="mdc-select__selected-text">{{value}}</span>
+  <span class="mdc-select__selected-text">{{selectedTextValue}}</span>
   <div class="mdc-simple-menu mdc-select__menu"
       @MDCSimpleMenu:selected="onSelected">
     <ul class="mdc-list mdc-simple-menu__items">
-      <slot
-        v-for="option in options"
-        :optionName="option.name"
-        :optionValue="option.value">
-      </slot>
+      <slot></slot>
     </ul>
   </div>
 </div>
@@ -25,12 +21,8 @@ export default {
   name: 'mdc-select',
   props: {
     id: String,
-    options: {
-      type: Array,
-      required: true
-    },
     value: {
-      type: String,
+      type: [Number, String],
       required: true
     }
   },
@@ -48,10 +40,22 @@ export default {
   },
   methods: {
     onChange () {
-      this.$emit('input', this.select.value);
+      this.$emit('input', this.select.value, this.select.selectedIndex);
     },
     onSelected (event) {
       this.$emit('selected', event.detail.item.id);
+    },
+    item (index) {
+      return this.select ? this.select.item(index) : null;
+    },
+    nameditem (key) {
+      return this.select ? this.select.nameditem(key) : null;
+    }
+  },
+  computed: {
+    selectedTextValue () {
+      let item = this.nameditem(this.value);
+      return item ? item.textContent : this.value;
     }
   }
 }

@@ -4,11 +4,10 @@
     <toolbar>
       <span slot="section-start" class="mdc-toolbar__title catalog-title">Kit labels</span>
       <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark" v-model="selectedKitType" @selected="fetchKitComponents" :options="kitTypes">
-        <template scope="item">
-          <li class="mdc-list-item" role="option" :id="item.optionValue" tabindex="0">
-            {{item.optionName}}
-          </li>
-        </template>
+        <li class="mdc-list-item" role="option" :id="kitType.value" tabindex="0"
+          v-for="kitType in kitTypes">
+          {{kitType.name}}
+        </li>
       </mdc-select>
       <label slot="section-end" ref="search" class="mdc-textfield search-box">
         <input type="text" class="mdc-textfield__input mdc-theme--text-primary-on-dark" v-model="filterBy">
@@ -20,163 +19,30 @@
     <main class="main mdc-toolbar-fixed-adjust">
       <section id="tab-nav">
         <nav ref="tabs" id="tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
-          <a role="tab" aria-controls="By kit" class="mdc-tab" :class="{ 'mdc-tab--active': activeTab === 'BY KIT' }" href="#panel-1">By Kit</a>
-          <a role="tab" aria-controls="By component" class="mdc-tab" :class="{ 'mdc-tab--active': activeTab === 'BY COMPONENT' }" href="#panel-2">By Component</a>
+          <a role="tab" aria-controls="By kit" class="mdc-tab" id="kit">By Kit</a>
+          <a role="tab" aria-controls="By component" class="mdc-tab" id="component">By Component</a>
           <span class="mdc-tab-bar__indicator"></span>
         </nav>
       </section>
-      <section v-show="Object.keys(kits).length > 0">
-        <div class="panels" ref="panels">
-          <div class="panel" :class="{ active: activeTab === 'BY KIT' }" id="panel-1" role="tabpanel" aria-hidden="false">
-            <div class="table-header">
-              <div class="table-header__summary">
-                <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
-                <span class="table-header__header">Kit label</span>
-                <span class="table-header__secondary-content">Status</span>
-                <span class="table-header__interactive-content">
-                  <button class="table-header__button material-icons" @click="toggleDetails">swap_vert</button></span>
-              </div>
-            </div>
-            <details class="mdc-expansion" ref="kit_expansions" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
-              <summary class="mdc-expansion__summary">
-                <div>
-                  <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
-                  <span class="mdc-expansion__header">{{ items[0].kitLabel }}</span>
-                  <span class="mdc-expansion__secondary-content">{{ items[0].kitStatus }}</span>
-                </div>
-              </summary>
-              <div class="mdc-expansion__content">
-                <table ref="componentsTables" class="mdl-data-table">
-                  <tbody>
-                    <tr v-for="item in items" @click.capture="item.selected = !item.selected">
-                      <td>
-                        <mdc-checkbox v-model="item.selected" />
-                      </td>
-                      <td class="mdl-data-table__cell--non-numeric">{{ item.componentType }}</td>
-                      <td>{{ item.quantity }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </details>
-          </div>
-          <div class="panel" :class="{ active: activeTab === 'BY COMPONENT' }" id="panel-2" role="tabpanel" aria-hidden="true">
-            <div class="table-header">
-              <div class="table-header__summary">
-                <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
-                <span class="table-header__header">Component Type</span>
-                <span class="table-header__secondary-content"></span>
-                <span class="table-header__interactive-content">
-                  <button class="table-header__button material-icons" @click="toggleDetails">swap_vert</button>
-                </span>
-              </div>
-            </div>
-            <details class="mdc-expansion" ref="component_expansions" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
-              <summary class="mdc-expansion__summary">
-                <div>
-                  <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
-                  <span class="mdc-expansion__header">{{ items[0].componentType }}</span>
-                </div>
-              </summary>
-              <div class="mdc-expansion__content">
-                <table ref="componentsTables" class="mdl-data-table">
-                  <tbody>
-                    <tr v-for="item in items" @click.capture="item.selected = !item.selected">
-                      <td>
-                        <mdc-checkbox v-model="item.selected" />
-                      </td>
-                      <td class="mdl-data-table__cell--non-numeric">{{ item.kitLabel }}</td>
-                      <td class="mdl-data-table__cell--non-numeric">{{ item.kitStatus }}</td>
-                      <td>{{ item.quantity }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </details>
-          </div>
-        </div>
+      <section>
+        <transition appear name="component-fade" mode="out-in">
+          <keep-alive>
+            <component :is='currentView' :kitComponents='kitComponents' :filterBy='filterBy'></component>
+          </keep-alive>
+        </transition>
       </section>
-      <button id="print-selected" @click="openPrintSelectedDialog" class="mdc-button mdc-button--accent mdc-button--raised">
+      <button id="print-selected" @click="$refs.print.show()" class="mdc-button mdc-button--accent mdc-button--raised">
         <span class="v-align-middle material-icons">print</span>
         <span>Print selected</span>
       </button>
       <snackbar event="notify"></snackbar>
-      <mdc-dialog ref="options">
-        <section id="tab-nav">
-          <nav ref="optionstabs" id="options-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
-            <a role="tab" aria-controls="Statuses" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'STATUSES' }" href="#options-panel-1">Statuses</a>
-            <a role="tab" aria-controls="Default View" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'DEFAULT TAB' }" href="#options-panel-2">Default View</a>
-            <span class="mdc-tab-bar__indicator"></span>
-          </nav>
-        </section>
-        <section>
-          <div class="panels" ref="optionspanels">
-            <div class="panel" :class="{ active: activeOptionsTab === 'STATUSES' }" id="options-panel-1" role="tabpanel" aria-hidden="false">
-              <div class="two-columns">
-                <div v-for="status in kitStatuses" class="mdc-form-field">
-                  <mdc-checkbox :id="'status-checkbox-'+status.id" :labelId="'status-checkbox-label-'+status.id" :value="status.id" v-model="selectedKitStatuses" />
-                  <label :id="'status-checkbox-label-'+status.id" :for="'status-checkbox-'+status.id">{{ status.label }}</label>
-                </div>
-              </div>
-            </div>
-            <div class="panel" :class="{ active: activeOptionsTab === 'DEFAULT VIEW' }" id="options-panel-2" role="tabpanel" aria-hidden="false">
-              <mdc-select class="mdc-theme--text-primary" v-model="selectedDefaultTab" @selected="updateDefaultTab" :options="tabs">
-                <template scope="item">
-                  <li class="mdc-list-item" role="option" :id="item.optionValue" tabindex="0">
-                    {{item.optionName}}
-                  </li>
-                </template>
-              </mdc-select>
-            </div>
-          </div>
-        </section>
-        <footer class="mdc-dialog__footer" slot="footer">
-          <button type="button" class="mdc-button mdc-dialog__footer__button" @click="() => { fetchKitComponents(); $refs.options.close(); }">
-            Update
-          </button>
-        </footer>
-      </mdc-dialog>
-      <mdc-dialog id="print-dialog"
-        title="Print selected labels via BarTender"
-        ref="print"
-        @cancel="labelGroups = []">
-        <template v-for="group in labelGroups">
-          <ul class="mdc-list mdc-list--two-line mdc-list--avatar-list">
-            <li class="mdc-list-divider" role="separator"></li>
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__start-detail">
-                <select-all :items="group.labels" selectedKey="selected" />
-              </span>
-              <span class="mdc-list-item__text">{{ group.componentType }}
-                <span class="mdc-list-item__text__secondary">{{ (group.description || group.templateFile) + '&ensp;(' + group.printer + ')' }}</span>
-              </span>
-            </li>
-          </ul>
-          <div class="mdc-layout-grid">
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1"></div>
-            <div class="mdc-layout-grid__cell" v-for="header in group.headers">{{ header }}</div>
-          </div>
-          <div class="mdc-layout-grid" v-for="row in group.labels">
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-1">
-              <mdc-checkbox class="center-flex-item" v-model="row.selected" />
-            </div>
-            <div class="mdc-layout-grid__cell mdc-textfield mdc-textfield--fullwidth" v-for="(v,i) in row.variables">
-              <input type="text" class="mdc-textfield__input" v-model="row.variables[i]">
-            </div>
-          </div>
-          <br><br>
-        </template>
-        <footer class="mdc-dialog__footer" slot="footer">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel"
-                  @click="$refs.print.close()">
-            Cancel
-          </button>
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept"
-                  @click="submitLabelsToBarTender">
-            Print
-          </button>
-        </footer>
-      </mdc-dialog>
+      <app-dialog-options
+        ref='options'
+        :kitStatuses='kitStatuses'
+        @updateStatuses="statuses => { selectedKitStatuses = statuses; fetchKitComponents(); }">
+      </app-dialog-options>
+      <app-dialog-print ref='print' :kitComponents='kitComponents'>
+      </app-dialog-print>
     </main>
   </body>
 </template>
@@ -187,98 +53,54 @@ import mdcSelect from './components/Select';
 import {MDCTextfield} from '@material/textfield';
 import Snackbar from './components/Snackbar';
 import mdcDialog from './components/Dialog';
-import mdcCheckbox from './components/Checkbox';
-import SelectAll from './components/SelectAll';
-import {MDCTabBar, MDCTabFoundation} from '@material/tabs';
+import {MDCTabBar} from '@material/tabs';
+import appDialogPrint from './AppDialogPrint';
+import appDialogOptions from './AppDialogOptions';
+import appViewKitFirst from './AppViewKitFirst';
+import appViewComponentFirst from './appViewComponentFirst';
 
 export default {
   name: 'app',
-  components: { Toolbar, mdcSelect, Snackbar, mdcDialog, mdcCheckbox, SelectAll, MDCTabBar, MDCTabFoundation },
+  components: {
+    Toolbar,
+    mdcSelect,
+    Snackbar,
+    mdcDialog,
+    MDCTabBar,
+    appDialogPrint,
+    appDialogOptions
+  },
   data () {
     return {
-      filterBy: '',
-      panels: [],
       kitTypes: [],
       selectedKitType: 'Select kit type',
-      selectedDefaultTab: this.defaultTab ? this.defaultTab : 'Select default tab',
-      tabs: [{name: 'By kit', value: 'BY KIT'}, {name: 'By component', value: 'BY COMPONENT'}],
-      defaultTab: localStorage.getItem('DefaultTab'),
+      filterBy: '',
       kitStatuses: [],
-      kitComponents: [],
-      loading: false,
-      dataTable: null,
-      selectedKitStatuses: localStorage.getItem('SelectedStatuses') ? JSON.parse(localStorage.getItem('SelectedStatuses')) : [1],
-      optionsTabBar: null,
+      selectedKitStatuses: localStorage.getItem('SelectedStatuses') ? JSON.parse(localStorage.getItem('SelectedStatuses')) : [6],
       tabBar: null,
-      labelGroups: []
+      kitComponents: [],
+      loading: false
     }
   },
   computed: {
-    kits () {
-      var vm = this;
-      return vm.kitComponents.reduce(function (grouped, item) {
-        grouped[item.kitLabel] = grouped[item.kitLabel] || [];
-        grouped[item.kitLabel].push(item);
-        return grouped;
-      }, Object.create(null));
-    },
-    components () {
-      var vm = this;
-      return vm.kitComponents.reduce(function (grouped, item) {
-        grouped[item.componentType] = grouped[item.componentType] || [];
-        grouped[item.componentType].push(item);
-        return grouped;
-      }, Object.create(null));
-    },
-    activeTab () {
-      return this.tabBar && this.tabBar.activeTab ? this.tabBar.activeTab.root_.getAttribute('aria-controls').toUpperCase() : this.defaultTab != null ? this.defaultTab : 'BY KIT';
-    },
-    activeOptionsTab () {
-      return this.optionsTabBar && this.optionsTabBar.activeTab ? this.optionsTabBar.activeTab.root_.getAttribute('aria-controls').toUpperCase() : 'STATUSES';
+    currentView () {
+      if (this.kitComponents.length === 0) {
+        return null;
+      }
+      var tabId = this.tabBar && this.tabBar.activeTab
+        ? this.tabBar.activeTab.root_.id
+        : localStorage.getItem('DefaultTab');
+
+      switch (tabId) {
+        case 'kit':
+        default:
+          return appViewKitFirst;
+        case 'component':
+          return appViewComponentFirst;
+      }
     }
   },
   methods: {
-    generateLabelGroups () {
-      var vm = this;
-      let filteredItems = this.kitComponents.filter(item => item.selected);
-
-      // expand and sort kit-component items to kit-label_type-component groups
-      let labelGroups = filteredItems.reduce((prev, item) => {
-        let expandedItems = item.labels.map(labelType => {
-          Object.assign(labelType, {
-            componentType: item.componentType,
-            headers: item.headers,
-            kitLabel: item.kitLabel,
-          });
-          vm.$set(labelType, 'labels', item.values.map(row => ({
-            variables: row.slice(),
-            selected: true
-          })));
-          return labelType;
-        });
-
-        return [...prev, ...expandedItems];
-      }, []);
-
-      let sortedGroups = labelGroups.sort((a, b) => {
-        var sortOrder = a.kitLabel.localeCompare(b.kitLabel);
-        if (sortOrder !== 0) return sortOrder;
-        sortOrder = a.templateFile.localeCompare(b.templateFile);
-        if (sortOrder !== 0) return sortOrder;
-        return a.componentType.localeCompare(b.componentType);
-      });
-
-      return sortedGroups;
-    },
-    toggleDetails () {
-      let expansions = this.activeTab === 'BY KIT' ? this.$refs.kit_expansions
-        : this.$refs.component_expansions;
-      let status = !expansions[0].open;
-      expansions.forEach(e => { e.open = status; });
-    },
-    updateDefaultTab (selectedTab) {
-      localStorage.setItem('DefaultTab', selectedTab)
-    },
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
       var vm = this;
@@ -316,34 +138,6 @@ export default {
           });
         }
       });
-    },
-    openPrintSelectedDialog () {
-      this.labelGroups = this.generateLabelGroups();
-      this.$refs.print.show();
-    },
-    submitLabelsToBarTender () {
-      let vm = this;
-      let labelMap = new Map();
-      this.labelGroups.forEach(group => {
-        let key = { templateFile: group.templateFile, printer: group.printer };
-        let value = [...(labelMap.get(key) || [group.headers]), ...group.labels.map(l => l.variables)];
-        labelMap.set(key, value);
-      });
-      let data = JSON.stringify(Array.from(labelMap));
-      fetch('api/printLabels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: data })
-      .then(function (response) {
-        response.text().then(function (text) {
-          vm.$root.$emit('notify', {
-            message: text
-          });
-          vm.labelGroups = [];
-        });
-      });
-    }
-  },
-  watch: {
-    selectedKitStatuses: function (value) {
-      localStorage.setItem('SelectedStatuses', JSON.stringify(value));
     }
   },
   created () {
@@ -387,7 +181,9 @@ export default {
     // wire up MDC components
     MDCTextfield.attachTo(this.$refs.search);
     this.tabBar = MDCTabBar.attachTo(this.$refs.tabs);
-    this.optionsTabBar = MDCTabBar.attachTo(this.$refs.optionstabs);
+    let defaultTabId = localStorage.getItem('DefaultTab');
+    let defaultTab = this.tabBar.tabs.find(tab => tab.root_.id === defaultTabId);
+    this.tabBar.activeTab = defaultTab || this.tabBar.tabs[0];
   }
 }
 
@@ -406,10 +202,8 @@ $mdc-theme-background: #fff;
 <style src="@material/button/mdc-button.scss" lang="scss"></style>
 <style src="./assets/mdl/data-table/data-table.scss" lang="scss"></style>
 <style src="@material/list/mdc-list.scss" lang="scss"></style>
-<style src="@material/form-field/mdc-form-field.scss" lang="scss"></style>
 <style src="@material/tabs/mdc-tabs.scss" lang="scss"></style>
 <style src="./components/mdc-expansion.scss" lang="scss"></style>
-<style src="@material/layout-grid/mdc-layout-grid.scss" lang="scss"></style>
 
 <style lang="scss">
 .v-align-middle {
@@ -441,7 +235,7 @@ $mdc-theme-background: #fff;
 }
 
 .mdc-textfield.search-box {
-  margin: 0 16px;
+  margin: 0 16px !important;
   height: 32px !important;
 }
 
@@ -452,26 +246,6 @@ $mdc-theme-background: #fff;
   bottom: 0;
   margin-right: 40px;
   margin-bottom: 40px;
-}
-
-#print-dialog {
-
-  .mdc-dialog__surface {
-    max-height: 90vh;
-  }
-
-  .mdc-dialog__body {
-    max-height: inherit;
-    overflow: scroll;
-  }
-
-  .mdc-layout-grid {
-    --mdc-layout-grid-margin: 4px;
-  }
-
-  .mdc-textfield--fullwidth {
-    height: 40px;
-  }
 }
 
 @import "@material/elevation/mixins";
@@ -500,19 +274,6 @@ $mdc-theme-background: #fff;
       }
     width: 100%;
     margin-left: 12px;
-  }
-}
-
-.two-columns {
-  -webkit-column-count: 2;
-  -webkit-column-gap: 20px;
-  -moz-column-count: 2;
-  -moz-column-gap: 20px;
-  column-count: 2;
-  column-gap: 20px;
-
-  .mdc-form-field {
-    width: 100%;
   }
 }
 
@@ -588,12 +349,11 @@ $mdc-theme-background: #fff;
   margin-top: 8px;
 }
 
-.panel {
-  display: none;
+.component-fade-enter-active, .component-fade-leave-active {
+  transition: opacity .3s ease;
 }
-
-.panel.active {
-  display: block;
+.component-fade-enter, .component-fade-leave-to
+/* .component-fade-leave-active for <2.1.8 */ {
+  opacity: 0;
 }
-
 </style>
