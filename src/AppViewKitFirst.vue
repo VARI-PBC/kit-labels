@@ -8,6 +8,14 @@
       <span class="table-header__interactive-content">
         <button class="table-header__button material-icons" @click="toggleDetails">swap_vert</button></span>
     </div>
+    <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate" :class="{ 'mdc-linear-progress--closed': !loading }">
+      <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+        <span class="mdc-linear-progress__bar-inner"></span>
+      </div>
+      <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+        <span class="mdc-linear-progress__bar-inner"></span>
+      </div>
+    </div>
   </div>
   <details class="mdc-expansion" ref="expansions" v-for="items in kits" :key="items[0].kitLabel" v-if="items[0].kitLabel.includes(filterBy)">
     <summary class="mdc-expansion__summary">
@@ -50,7 +58,8 @@ export default {
     filterBy: {
       type: String,
       required: true
-    }
+    },
+    loading: Boolean
   },
   data () {
     return {}

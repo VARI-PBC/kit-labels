@@ -3,7 +3,11 @@
     <!-- Header -->
     <toolbar>
       <span slot="section-start" class="mdc-toolbar__title catalog-title">Kit labels</span>
-      <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark" v-model="selectedKitType" @selected="fetchKitComponents" :options="kitTypes">
+      <mdc-select slot="section-end" class="mdc-theme--text-primary-on-dark"
+        v-model="selectedKitType"
+        unselectedText="Select kit type"
+        @selected="fetchKitComponents"
+        :options="kitTypes">
         <li class="mdc-list-item" role="option" :id="kitType.value" tabindex="0"
           v-for="kitType in kitTypes">
           {{kitType.name}}
@@ -27,7 +31,10 @@
       <section>
         <transition appear name="component-fade" mode="out-in">
           <keep-alive>
-            <component :is='currentView' :kitComponents='kitComponents' :filterBy='filterBy'></component>
+            <component :is="currentView"
+              :kitComponents="kitComponents"
+              :filterBy="filterBy"
+              :loading="loading"></component>
           </keep-alive>
         </transition>
       </section>
@@ -37,11 +44,11 @@
       </button>
       <snackbar event="notify"></snackbar>
       <app-dialog-options
-        ref='options'
-        :kitStatuses='kitStatuses'
-        @updateStatuses="statuses => { selectedKitStatuses = statuses; fetchKitComponents(); }">
+        ref="options"
+        :kitStatuses="kitStatuses"
+        @updateKitStatuses="updateKitStatuses">
       </app-dialog-options>
-      <app-dialog-print ref='print' :kitComponents='kitComponents'>
+      <app-dialog-print ref="print" :kitComponents="kitComponents">
       </app-dialog-print>
     </main>
   </body>
@@ -73,7 +80,7 @@ export default {
   data () {
     return {
       kitTypes: [],
-      selectedKitType: 'Select kit type',
+      selectedKitType: '',
       filterBy: '',
       kitStatuses: [],
       selectedKitStatuses: localStorage.getItem('SelectedStatuses') ? JSON.parse(localStorage.getItem('SelectedStatuses')) : [6],
@@ -84,7 +91,7 @@ export default {
   },
   computed: {
     currentView () {
-      if (this.kitComponents.length === 0) {
+      if (!this.selectedKitType) {
         return null;
       }
       var tabId = this.tabBar && this.tabBar.activeTab
@@ -104,6 +111,7 @@ export default {
     fetchKitComponents (kitType) {
       if (kitType) this.selectedKitType = kitType;
       var vm = this;
+
       if (!vm.selectedKitType || vm.selectedKitStatuses.length === 0) {
         if (!vm.selectedKitType) {
           vm.$root.$emit('notify', {
@@ -138,6 +146,12 @@ export default {
           });
         }
       });
+    },
+    updateKitStatuses (kitStatuses, refresh) {
+      this.selectedKitStatuses = kitStatuses;
+      if (refresh) {
+        this.fetchKitComponents();
+      }
     }
   },
   created () {
@@ -204,6 +218,7 @@ $mdc-theme-background: #fff;
 <style src="@material/list/mdc-list.scss" lang="scss"></style>
 <style src="@material/tabs/mdc-tabs.scss" lang="scss"></style>
 <style src="./components/mdc-expansion.scss" lang="scss"></style>
+<style src="@material/linear-progress/mdc-linear-progress.scss" lang="scss"></style>
 
 <style lang="scss">
 .v-align-middle {

@@ -24,7 +24,8 @@ export default {
     value: {
       type: [Number, String],
       required: true
-    }
+    },
+    unselectedText: String
   },
   data () {
     return {
@@ -55,7 +56,7 @@ export default {
   computed: {
     selectedTextValue () {
       let item = this.nameditem(this.value);
-      return item ? item.textContent : this.value;
+      return item ? item.textContent : this.unselectedText;
     }
   }
 }

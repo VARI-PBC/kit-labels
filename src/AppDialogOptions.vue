@@ -1,5 +1,5 @@
 <template>
-<mdc-dialog ref="root">
+<mdc-dialog ref="root" @cancel="updateKitStatuses(false)">
   <section id="tab-nav">
     <nav ref="optionstabs" id="options-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
       <a role="tab" aria-controls="Statuses" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'STATUSES' }">Statuses</a>
@@ -20,6 +20,7 @@
       <div class="panel" :class="{ active: activeOptionsTab === 'DEFAULT VIEW' }" id="options-panel-2" role="tabpanel" aria-hidden="false">
         <mdc-select class="mdc-theme--text-primary"
           v-model="selectedDefaultTab"
+          unselectedText="Select default tab"
           @input="updateDefaultTab">
           <li class="mdc-list-item" role="option" id="kit" tabindex="0">
             By kit
@@ -32,7 +33,7 @@
     </div>
   </section>
   <footer class="mdc-dialog__footer" slot="footer">
-    <button type="button" class="mdc-button mdc-dialog__footer__button" @click="updateStatuses">
+    <button type="button" class="mdc-button mdc-dialog__footer__button" @click="updateKitStatuses(true)">
       Update
     </button>
   </footer>
@@ -57,7 +58,7 @@ export default {
   data () {
     return {
       selectedKitStatuses: localStorage.getItem('SelectedStatuses') ? JSON.parse(localStorage.getItem('SelectedStatuses')) : [6],
-      selectedDefaultTab: localStorage.getItem('DefaultTab') || 'Select default tab',
+      selectedDefaultTab: localStorage.getItem('DefaultTab'),
       optionsTabBar: null
     }
   },
@@ -73,8 +74,8 @@ export default {
     updateDefaultTab (value) {
       localStorage.setItem('DefaultTab', value);
     },
-    updateStatuses () {
-      this.$emit('updateStatuses', this.selectedKitStatuses);
+    updateKitStatuses (refresh = true) {
+      this.$emit('updateKitStatuses', this.selectedKitStatuses, refresh);
       this.$refs.root.close();
     }
   },
