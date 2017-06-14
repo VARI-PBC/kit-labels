@@ -54,12 +54,13 @@ app.get('/api/kits', async function (request, response) {
 });
 
 app.post('/api/printLabels', async function (request, response) {
-  request.body.forEach(job => {
+  request.body.forEach((job, jobIndex) => {
     let commands = `%BTW% /AF="${path.join(config.labels.templatePath, job[0].templateFile)}" /P /PRN="${job[0].printer}" /D=<Trigger File Name> /R=3 /X\r
 %END%\r
 `;
-    var data = job[1].map(row => row.join('\t')).join('\r\n');
-    fs.writeFileSync(config.bsi.logonArgs.username + '-' + dateformat(new Date(), 'yyyymmdd-HHMMss') + '.dat', commands + data);
+    let data = job[1].map(row => row.join('\t')).join('\r\n');
+    let filename = `${config.bsi.logonArgs.username}-${dateformat(new Date(), 'yyyymmdd-HHMMss')}-${jobIndex}.dat`;
+    fs.writeFileSync(path.join(config.labels.jobsPath, filename), commands + data);
   })
   response.status(200).send('Print job submitted.');
 })
