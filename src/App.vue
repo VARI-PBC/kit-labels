@@ -152,6 +152,7 @@ export default {
       if (refresh) {
         this.fetchKitComponents();
       }
+      localStorage.setItem('SelectedStatuses', JSON.stringify(kitStatuses));
     }
   },
   created () {
