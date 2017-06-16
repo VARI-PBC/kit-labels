@@ -2,7 +2,7 @@
 <div role="tabpanel" aria-hidden="true" class="panels">
   <div class="table-header">
     <div class="table-header__summary">
-      <select-all :items="kitComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
+      <select-all :items="filteredComponents" :selectedKey="'selected'" class="table-header__header"></select-all>
       <span class="table-header__header">Component Type</span>
       <span class="table-header__secondary-content"></span>
       <span class="table-header__interactive-content">
@@ -18,7 +18,7 @@
       </div>
     </div>
   </div>
-  <details class="mdc-expansion" ref="component_expansions" v-for="items in components" :key="items[0].componentType" v-if="items[0].componentType.includes(filterBy)">
+  <details class="mdc-expansion" ref="component_expansions" v-for="items in components" :key="items[0].componentType">
     <summary class="mdc-expansion__summary">
       <div>
         <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -66,8 +66,16 @@ export default {
     return {}
   },
   computed: {
+    filteredComponents () {
+      let vm = this;
+      function filterComponents (kitComponent) {
+        return kitComponent.componentType.includes(vm.filterBy)
+      }
+
+      return this.kitComponents.filter(filterComponents)
+    },
     components () {
-      return groupBy(this.kitComponents, 'componentType');
+      return groupBy(this.filteredComponents, 'componentType');
     }
   },
   methods: {
