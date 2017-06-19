@@ -1,6 +1,23 @@
 module.exports = [
   {
     'kitTypes': ['MMRF Kit'],
+    'labels': [
+      {
+        'description': 'kit label',
+        'templateFile': 'MMRF Kit ID Label.btw',
+        'printer': 'BW2BW08'
+      }
+    ],
+    'labelVariables': [
+      {
+        'name': 'btKitID',
+        'value': '%kitLabel%',
+        'sequenceSpec': '1-3'
+      }
+    ]
+  },
+  {
+    'kitTypes': ['MMRF Kit'],
     'componentTypes': ['MMRF NaHep 6ml Tube'],
     'labels': [
       {
