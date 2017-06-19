@@ -18,7 +18,7 @@
       { 
         "name": "btID",
         "value": "%kitLabel%-%sequence%",
-        "sequenceSpec": "1-4,5,6,7-10",
+        "sequenceSpec": "1-10",
         "padding": "00"
       },
       { 
