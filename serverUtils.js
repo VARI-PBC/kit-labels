@@ -135,6 +135,9 @@ var utils = {
     let self = this;
     let kitTypeName = (await this.kitTypes).find(kt => kt.value === kitType).name;
     let kitConfig = (await this.kitConfigs)[kitTypeName];
+    if (!kitConfig) {
+      return [];
+    }
     let kitComponents = resultSet.map(function (row) {
       let kitComponent = {
         kitLabel: row[0],
