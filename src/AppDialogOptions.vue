@@ -128,6 +128,7 @@ export default {
 
 .panel.active {
   display: block;
+  min-height: 200px;
 }
 
 </style>
