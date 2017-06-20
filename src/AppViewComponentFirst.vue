@@ -18,7 +18,7 @@
       </div>
     </div>
   </div>
-  <details class="mdc-expansion" ref="component_expansions" v-for="items in components" :key="items[0].componentType">
+  <details class="mdc-expansion" ref="component_expansions" v-for="items in components" :key="items[0].componentType" :open="open">
     <summary class="mdc-expansion__summary">
       <div>
         <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -60,10 +60,14 @@ export default {
       type: String,
       required: true
     },
-    loading: Boolean
+    loading: Boolean,
+    open: {
+      type: Boolean,
+      default: localStorage.getItem('DefaultExpansion') ? localStorage.getItem('DefaultExpansion') === 'expand' : false
+    }
   },
   data () {
-    return {}
+    return { }
   },
   computed: {
     filteredComponents () {
@@ -80,8 +84,8 @@ export default {
   },
   methods: {
     toggleDetails () {
-      let status = !this.$refs.expansions[0].open;
-      this.$refs.expansions.forEach(e => { e.open = status; });
+      let status = !this.$refs.component_expansions[0].open;
+      this.$refs.component_expansions.forEach(e => { e.open = status; });
     }
   }
 }

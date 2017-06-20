@@ -68,6 +68,10 @@ export default {
 <style>
 
 .mdc-select .mdc-simple-menu {
-  overflow: scroll;
+  overflow: auto;
+}
+
+.mdc-select {
+  min-width: 125px;
 }
 </style>

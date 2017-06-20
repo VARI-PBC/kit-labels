@@ -17,7 +17,7 @@
       </div>
     </div>
   </div>
-  <details class="mdc-expansion" ref="expansions" v-for="items in kits" :key="items[0].kitLabel">
+  <details class="mdc-expansion" ref="expansions" v-for="items in kits" :key="items[0].kitLabel" :open="open">
     <summary class="mdc-expansion__summary">
       <div>
         <select-all :items="items" :selectedKey="'selected'" class="mdc-expansion__header"></select-all>
@@ -59,10 +59,14 @@ export default {
       type: String,
       required: true
     },
-    loading: Boolean
+    loading: Boolean,
+    open: {
+      type: Boolean,
+      default: localStorage.getItem('DefaultExpansion') ? localStorage.getItem('DefaultExpansion') === 'expand' : false
+    }
   },
   data () {
-    return {}
+    return { }
   },
   computed: {
     filteredComponents () {
