@@ -1,10 +1,10 @@
 <template>
 <mdc-dialog ref="root" @cancel="updateKitStatuses(false)">
   <section id="tab-nav">
-    <nav ref="optionstabs" id="options-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
-      <a role="tab" aria-controls="Statuses" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'STATUSES' }">Statuses</a>
-      <a role="tab" aria-controls="Default View" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'DEFAULT TAB' }">Default View</a>
-      <a role="tab" aria-controls="Default Expansion" class="mdc-tab" :class="{ 'mdc-tab--active': activeOptionsTab === 'DEFAULT EXPANSION' }">Default Expansion</a>
+    <nav ref="tabs" id="options-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
+      <a role="tab" aria-controls="Statuses" class="mdc-tab">Statuses</a>
+      <a role="tab" aria-controls="Default View" class="mdc-tab">Default View</a>
+      <a role="tab" aria-controls="Default Expansion" class="mdc-tab">Default Expansion</a>
       <span class="mdc-tab-bar__indicator"></span>
     </nav>
   </section>
@@ -47,9 +47,16 @@
     </div>
   </section>
   <footer class="mdc-dialog__footer" slot="footer">
-    <button type="button" class="mdc-button mdc-dialog__footer__button" @click="updateKitStatuses(true)">
-      Update
-    </button>
+    <span v-if="activeOptionsTab === 'STATUSES'">
+      <button type="button" class="mdc-button mdc-dialog__footer__button" @click="updateKitStatuses(true)">
+        Update
+      </button>
+    </span>
+    <span v-if="activeOptionsTab !== 'STATUSES'">
+      <button type="button" class="mdc-button mdc-dialog__footer__button" @click="updateKitStatuses(false)">
+        Done
+      </button>
+    </span>
   </footer>
 </mdc-dialog>
 </template>
@@ -98,7 +105,7 @@ export default {
     }
   },
   mounted () {
-    this.optionsTabBar = MDCTabBar.attachTo(this.$refs.optionstabs);
+    this.optionsTabBar = MDCTabBar.attachTo(this.$refs.tabs);
   }
 }
 </script>
