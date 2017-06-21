@@ -1,5 +1,21 @@
 [
-    {
+  {
+    "kitType": ["SU2C* Kit"],
+    "labels": [
+      {
+        "description": "kit label",
+        "templateFile": "SU2C Kit ID.btw",
+        "printer": "BW2BW08"
+      }
+    ],
+    "labelVariables": [
+      {
+        "name": "btID",
+        "value": "%kitLabel%"
+      }
+    ]
+  },
+  {
     "kitTypes": ["SU2C-MDS Screening Kit"],
     "componentTypes": ["SU2C MDS-Cryovials 1mL"],
     "labels": [
@@ -10,7 +26,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "SU2C Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -22,7 +38,7 @@
         "padding": "00"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Cryovials"
       }
     ]
@@ -38,7 +54,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "SU2C Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -50,7 +66,7 @@
         "padding": "00"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Buccal Swabs"
       }
     ]
@@ -66,7 +82,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "SU2C Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -78,7 +94,7 @@
         "padding": "00"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Cryovials"
       }
     ]
@@ -89,12 +105,12 @@
     "labels": [
       {
         "description": "glass slide",
-        "templateFile": "CPTAC Glass Slide Label.btw",
+        "templateFile": "Glass Slide Label.btw",
         "printer": "BW2BW11"
       },
       {
         "description": "paperwork",
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "SU2C Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -106,7 +122,7 @@
         "padding": "00"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Slides"
       }
     ]
@@ -122,7 +138,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "SU2C Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -134,7 +150,7 @@
         "padding": "00"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Cryovials"
       }
     ]
@@ -150,7 +166,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "SU2C Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -162,7 +178,7 @@
         "padding": "00"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Buccal Swabs"
       }
     ]

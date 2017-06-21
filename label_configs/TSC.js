@@ -10,7 +10,7 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btKitID',
+        'name': 'btID',
         'value': '%kitLabel%'
       }
     ]
@@ -27,9 +27,8 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btID',
-        'value': '%kitLabel%-%sequence%',
-        'sequenceSpec': '1-2'
+        'name': 'btDescriptor',
+        'value': 'Peripheral Blood only'
       }
     ]
   },
@@ -38,14 +37,18 @@ module.exports = [
     'labels': [
       {
         'description': 'media expiration',
-        'templateFile': 'TSC EDTA Tube Expiration.btw',
+        'templateFile': 'Media Expiration.btw',
         'printer': 'BW2BW08'
       }
     ],
     'labelVariables': [
       {
-        'name': 'btEdtaExpDate',
-        'value': (kitFields, components) => 'EDTA Tubes: ' + components['TSC-EDTA 6ml Tube'].expiration.substr(0, 7)
+        'name': 'btMedia1',
+        'value': 'EDTA Tubes'
+      },
+      {
+        'name': 'btExpDate1',
+        'value': (kitFields, components) => components['TSC-EDTA 6ml Tube'].expiration.substr(0, 7)
       }
     ]
   },
@@ -61,9 +64,8 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'Label #',
-        'value': '%sequence%',
-        'sequenceSpec': '1-6'
+        'name': 'btDescriptor',
+        'value': 'Peripheral Blood only'
       }
     ]
   },
@@ -72,14 +74,18 @@ module.exports = [
     'labels': [
       {
         'description': 'media expiration',
-        'templateFile': 'TSC Kit Expiration.btw',
+        'templateFile': 'Media Expiration.btw',
         'printer': 'BW2BW08'
       }
     ],
     'labelVariables': [
       {
-        'name': 'btEdtaExpDate',
-        'value': (kitFields, components) => 'PAXgene RNA Tubes: ' + components['TSC-PAXgene RNA Tube'].expiration.substr(0, 7)
+        'name': 'btMedia1',
+        'value': 'PAXgene RNA Tubes'
+      },
+      {
+        'name': 'btExpDate1',
+        'value': (kitFields, components) => components['TSC-PAXgene RNA Tube'].expiration.substr(0, 7)
       }
     ]
   },
@@ -95,9 +101,8 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'Label #',
-        'value': '%sequence%',
-        'sequenceSpec': '1-3'
+        'name': 'btDescriptor',
+        'value': 'Peripheral Blood only'
       }
     ]
   },
@@ -113,9 +118,8 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'Label #',
-        'value': '%sequence%',
-        'sequenceSpec': '1-2'
+        'name': 'btDescriptor',
+        'value': 'Peripheral Blood only'
       }
     ]
   },
@@ -124,18 +128,26 @@ module.exports = [
     'labels': [
       {
         'description': 'media expiration',
-        'templateFile': 'TSC RNA Tube Expiration.btw',
+        'templateFile': 'Media Expiration.btw',
         'printer': 'BW2BW08'
       }
     ],
     'labelVariables': [
       {
-        'name': 'btEdtaExpDate',
-        'value': (kitFields, components) => 'PAXgene RNA Tubes: ' + components['TSC-PAXgene RNA Tube'].expiration.substr(0, 7)
+        'name': 'btMedia1',
+        'value': 'EDTA Tubes'
       },
       {
-        'name': 'btNaHepExpDate',
-        'value': (kitFields, components) => 'EDTA Tubes: ' + components['TSC-EDTA 6ml Tube'].expiration.substr(0, 7)
+        'name': 'btExpDate2',
+        'value': (kitFields, components) => components['TSC-EDTA 6ml Tube'].expiration.substr(0, 7)
+      },
+      {
+        'name': 'btMedia2',
+        'value': 'PAXgene RNA Tubes'
+      },
+      {
+        'name': 'btExpDate2',
+        'value': (kitFields, components) => components['TSC-PAXgene RNA Tube'].expiration.substr(0, 7)
       }
     ]
   },
@@ -150,23 +162,23 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btKitID',
+        'name': 'btID',
         'value': '%kitLabel%'
       }
     ]
   },
   {
     'kitTypes': ['TSC NHD Tissue Kit'],
-    'componentTypes': ['TSC-CryoELITE Vial'],
+    'componentTypes': ['TSC-CryoELITE Vial', 'TSC-Formalin Cups'],
     'labels': [
       {
         'description': 'CryoELITE',
-        'templateFile': 'TSC Cryovial.btw',
+        'templateFile': 'Cryovial.btw',
         'printer': 'BW2BW10'
       },
       {
         'description': 'paperwork',
-        'templateFile': 'TSC Paperwork.btw',
+        'templateFile': 'Paperwork.btw',
         'printer': 'BW2BW10'
       }
     ],
@@ -177,7 +189,7 @@ module.exports = [
         'sequenceSpec': '1-4'
       },
       {
-        'name': 'btDescription',
+        'name': 'btDescriptor',
         'value': 'Tissue'
       }
     ]

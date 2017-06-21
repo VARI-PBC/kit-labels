@@ -10,7 +10,7 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btKitID',
+        'name': 'btID',
         'value': '%kitLabel%',
         'sequenceSpec': '1-3'
       }
@@ -33,7 +33,7 @@ module.exports = [
         'sequenceSpec': '1-4'
       },
       {
-        'name': 'btDescription',
+        'name': 'btDescriptor',
         'value': 'Bone Marrow only'
       }
     ]
@@ -55,7 +55,7 @@ module.exports = [
         'sequenceSpec': '1-6'
       },
       {
-        'name': 'btDescription',
+        'name': 'btDescriptor',
         'value': 'Peripheral Blood only'
       }
     ]
@@ -72,7 +72,7 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btDescription',
+        'name': 'btDescriptor',
         'value': 'Bone Marrow only'
       }
     ]
@@ -89,7 +89,7 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btDescription',
+        'name': 'btDescriptor',
         'value': 'Peripheral Blood only'
       }
     ]
@@ -106,7 +106,7 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btDescription',
+        'name': 'btDescriptor',
         'value': 'Peripheral Blood only'
       }
     ]
@@ -123,8 +123,8 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btDescription',
-        'value': ''
+        'name': 'btDescriptor',
+        'value': 'Bone Marrow only'
       }
     ]
   },
@@ -140,7 +140,7 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btDescription',
+        'name': 'btDescriptor',
         'value': 'Peripheral Blood only'
       }
     ]
@@ -156,12 +156,20 @@ module.exports = [
     ],
     'labelVariables': [
       {
-        'name': 'btEdtaExpDate',
-        'value': (kitFields, components) => 'EDTA: ' + components['MMRF EDTA 6ml Tube'].expiration.substr(0, 7)
+        'name': 'btMedia1',
+        'value': 'EDTA'
       },
       {
-        'name': 'btNaHepExpDate',
-        'value': (kitFields, components) => 'Sodium Heparin: ' + components['MMRF NaHep 6ml Tube'].expiration.substr(0, 7)
+        'name': 'btExpDate1',
+        'value': (kitFields, components) => components['MMRF EDTA 6ml Tube'].expiration.substr(0, 7)
+      },
+      {
+        'name': 'btMedia2',
+        'value': 'Sodium Heparin'
+      },
+      {
+        'name': 'btExpDate2',
+        'value': (kitFields, components) => components['MMRF NaHep 6ml Tube'].expiration.substr(0, 7)
       }
     ]
   }

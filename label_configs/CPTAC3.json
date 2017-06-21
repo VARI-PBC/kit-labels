@@ -10,7 +10,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -22,7 +22,7 @@
         "padding": "00"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Frozen Tissue"
       }
     ]
@@ -32,7 +32,7 @@
     "componentTypes": ["CPT ___-FFPE Cassettes"],
     "labels": [
       {
-        "templateFile": "CPTAC cassette.btw",
+        "templateFile": "Cassette.btw",
         "printer": "Leica IP-C"
       }
     ],
@@ -43,7 +43,7 @@
         "sequenceSpec": "11-20"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "FFPE QC Block"
       }
     ]
@@ -53,7 +53,7 @@
     "componentTypes": ["CPT ___-Glass Slides"],
     "labels": [
       {
-        "templateFile": "CPTAC Glass Slide Label.btw",
+        "templateFile": "Glass Slide Label.btw",
         "printer": "BW2BW11"
       }
     ],
@@ -74,7 +74,7 @@
         "printer": "BW2BW10"
       },
       {
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -85,7 +85,7 @@
         "sequenceSpec": "31-32"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Whole Blood"
       }
     ]
@@ -99,7 +99,7 @@
         "printer": "BW2BW10"
       },
       {
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -110,7 +110,7 @@
         "sequenceSpec": "71-72"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Blood Derivatives"
       }
     ]
@@ -120,7 +120,7 @@
     "componentTypes": ["CPT ___-Glass Slides"],
     "labels": [
       {
-        "templateFile": "CPTAC Glass Slide Label.btw",
+        "templateFile": "Glass Slide Label.btw",
         "printer": "BW2BW11"
       }
     ],
@@ -141,7 +141,7 @@
         "printer": "BW2BW10"
       },
       {
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -152,7 +152,7 @@
         "sequenceSpec": "33-35"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Bone Marrow"
       }
     ]
@@ -182,7 +182,7 @@
         "printer": "BW2BW10"
       },
       {
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -193,7 +193,7 @@
         "sequenceSpec": "50-53"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Buccal Swab"
       }
     ]
@@ -207,7 +207,7 @@
         "printer": "BW2BW10"
       },
       {
-        "templateFile": "CPTAC Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -218,7 +218,7 @@
         "sequenceSpec": "54-64"
       },
       { 
-        "name": "btDescription",
+        "name": "btDescriptor",
         "value": "Cell Pellet"
       }
     ]
