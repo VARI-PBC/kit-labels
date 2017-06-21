@@ -4,7 +4,7 @@
     "labels": [
       {
         "description": "kit label",
-        "templateFile": "SU2C Kit ID.btw",
+        "templateFile": "Kit ID Label.btw",
         "printer": "BW2BW08"
       }
     ],
@@ -26,7 +26,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "SU2C Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -54,7 +54,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "SU2C Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -82,7 +82,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "SU2C Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -110,7 +110,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "SU2C Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -128,6 +128,27 @@
     ]
   },
   {
+    "kitTypes": ["SU2C-MDS Screening Kit","SU2C-MDS Treatment Kit","SU2C-AML Screening Kit"],
+    "labels": [
+      {
+        "description": "vial baggie",
+        "templateFile": "SU2C Baggie - Vials.btw",
+        "printer": "BW2BW11"
+      },
+      {
+        "description": "paperwork baggie",
+        "templateFile": "SU2C Baggie - Paperwork.btw",
+        "printer": "BW2BW10"
+      }
+    ],
+    "labelVariables": [
+      { 
+        "name": "btDescriptor",
+        "value": "Labels"
+      }
+    ]
+  },
+  {
     "kitTypes": ["SU2C-AML Screening Kit"],
     "componentTypes": ["SU2C AML-Cryovials 1mL"],
     "labels": [
@@ -138,7 +159,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "SU2C Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -166,7 +187,7 @@
       },
       {
         "description": "paperwork",
-        "templateFile": "SU2C Paperwork.btw",
+        "templateFile": "Paperwork.btw",
         "printer": "BW2BW10"
       }
     ],
