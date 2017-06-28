@@ -8,6 +8,8 @@ const bodyParser = require('body-parser');
 const dateformat = require('dateformat');
 const utils = require('./serverUtils');
 const ds = require('./serverDataSource');
+const logger = require('morgan');
+const FileStreamRotator = require('file-stream-rotator')
 
 // Create an express app
 var express = require('express');
@@ -54,16 +56,40 @@ app.get('/api/kits', async function (request, response) {
 });
 
 app.post('/api/printLabels', async function (request, response) {
-  request.body.forEach((job, jobIndex) => {
-    let commands = `%BTW% /AF="${path.join(config.labels.templatePath, job[0].templateFile)}" /P /PRN="${job[0].printer}" /D=<Trigger File Name> /R=3 /X\r
-%END%\r
-`;
-    let data = job[1].map(row => row.join('\t')).join('\r\n');
-    let filename = `${config.bsi.logonArgs.username}-${dateformat(new Date(), 'yyyymmdd-HHMMss')}-${jobIndex}.dat`;
-    fs.writeFileSync(path.join(config.labels.jobsPath, filename), commands + data);
+  try {
+    request.body.forEach((job, jobIndex) => {
+      let commands = `%BTW% /AF="${path.join(config.labels.templatePath, job[0].templateFile)}" /P /PRN="${job[0].printer}" /D=<Trigger File Name> /R=3 /X\r
+  %END%\r
+  `;
+      let data = job[1].map(row => row.join('\t')).join('\r\n');
+      let filename = `${config.bsi.logonArgs.username}-${dateformat(new Date(), 'yyyymmdd-HHMMss')}-${jobIndex}.dat`;
+      fs.writeFileSync(path.join(config.labels.jobsPath, filename), commands + data);
+    });
+    response.status(200).send('Print job submitted.');
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).json(error.message);
+  }
+});
+
+
+/// logging ///
+
+if (process.env.NODE_ENV === 'production') {
+  // create a rotating write stream
+  var accessLogStream = FileStreamRotator.getStream({
+    date_format: 'YYYYMMDD',
+    filename: path.join(config.server.logFiles, 'kit-labels-%DATE%.log'),
+    frequency: 'daily',
+    verbose: false
   })
-  response.status(200).send('Print job submitted.');
-})
+
+    // setup the logger
+  app.use(logger('combined', {stream: accessLogStream}))
+} else {
+  app.use(logger('dev'))
+}
+
 
 /// listener ///
 
