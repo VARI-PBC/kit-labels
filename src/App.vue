@@ -64,7 +64,7 @@ import {MDCTabBar} from '@material/tabs';
 import appDialogPrint from './AppDialogPrint';
 import appDialogOptions from './AppDialogOptions';
 import appViewKitFirst from './AppViewKitFirst';
-import appViewComponentFirst from './appViewComponentFirst';
+import appViewComponentFirst from './AppViewComponentFirst';
 
 export default {
   name: 'app',
