@@ -100,7 +100,7 @@ export default {
       let labelMap = new Map();
       this.labelGroups.forEach(group => {
         let key = { templateFile: group.templateFile, printer: group.printer };
-        let value = [...(labelMap.get(key) || [group.headers]), ...group.labels.map(l => l.variables)];
+        let value = [...(labelMap.get(key) || [group.headers]), ...group.labels.filter(l => l.selected).map(l => l.variables)];
         labelMap.set(key, value);
       });
       let data = JSON.stringify(Array.from(labelMap));
