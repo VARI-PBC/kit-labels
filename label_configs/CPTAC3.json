@@ -5,7 +5,7 @@
     "labels": [
       {
         "description": "cryovial",
-        "templateFile": "CPTAC Cryovial.btw",
+        "templateFile": "Cryovial.btw",
         "printer": "BW2BW10"
       },
       {
@@ -70,7 +70,7 @@
     "componentTypes": ["CPT ___-EDTA 6ml Tube"],
     "labels": [
       {
-        "templateFile": "CPTAC Cryovial.btw",
+        "templateFile": "Cryovial.btw",
         "printer": "BW2BW10"
       },
       {
@@ -95,7 +95,7 @@
     "componentTypes": ["CPT ___-Cryovials 2mL"],
     "labels": [
       {
-        "templateFile": "CPTAC Cryovial.btw",
+        "templateFile": "Cryovial.btw",
         "printer": "BW2BW10"
       },
       {
@@ -137,7 +137,7 @@
     "componentTypes": ["CPT ___-ACD 6ml Tube"],
     "labels": [
       {
-        "templateFile": "CPTAC Cryovial.btw",
+        "templateFile": "Cryovial.btw",
         "printer": "BW2BW10"
       },
       {
@@ -162,7 +162,7 @@
     "componentTypes": ["CPT ___-SepMate"],
     "labels": [
       {
-        "templateFile": "CPTAC Cryovial.btw",
+        "templateFile": "Cryovial.btw",
         "printer": "BW2BW10"
       }
     ],
@@ -178,7 +178,7 @@
     "componentTypes": ["CPT ___-Cryovials 2mL"],
     "labels": [
       {
-        "templateFile": "CPTAC Cryovial.btw",
+        "templateFile": "Cryovial.btw",
         "printer": "BW2BW10"
       },
       {
@@ -203,7 +203,7 @@
     "componentTypes": ["CPT ___-Microcentrifuge Tube 1.5ml"],
     "labels": [
       {
-        "templateFile": "CPTAC Cryovial.btw",
+        "templateFile": "Cryovial.btw",
         "printer": "BW2BW10"
       },
       {
