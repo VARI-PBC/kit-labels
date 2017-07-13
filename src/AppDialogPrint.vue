@@ -99,9 +99,12 @@ export default {
       let vm = this;
       let labelMap = new Map();
       this.labelGroups.forEach(group => {
-        let key = { templateFile: group.templateFile, printer: group.printer };
-        let value = [...(labelMap.get(key) || [group.headers]), ...group.labels.filter(l => l.selected).map(l => l.variables)];
-        labelMap.set(key, value);
+        let selectedLabels = group.labels.filter(l => l.selected).map(l => l.variables);
+        if (selectedLabels.length > 0) {
+          let key = { templateFile: group.templateFile, printer: group.printer };
+          let value = [...(labelMap.get(key) || [group.headers]), ...selectedLabels];
+          labelMap.set(key, value);
+        }
       });
       let data = JSON.stringify(Array.from(labelMap));
       fetch('api/printLabels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: data })
