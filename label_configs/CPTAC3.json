@@ -107,7 +107,7 @@
       { 
         "name": "btID",
         "value": "%kitLabel%-%sequence%",
-        "sequenceSpec": "71-72"
+        "sequenceSpec": "71-76"
       },
       { 
         "name": "btDescriptor",
